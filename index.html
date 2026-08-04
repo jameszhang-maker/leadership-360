@@ -1,0 +1,928 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Leadership 360 — Developing the Leader Within You 2.0</title>
+<style>
+:root{
+  --bg:#FAF8F5; --surface:rgba(32,28,26,.035); --surface-2:rgba(32,28,26,.06);
+  --fg:#202020; --fg-muted:#606060; --fg-faint:#909090;
+  --hair:rgba(180,130,80,.22); --hair-2:rgba(180,130,80,.12);
+  --primary:#FF9019; --accent:linear-gradient(135deg,#CD6A00 0%,#FF9019 100%); --accent-ink:#fff;
+  --radius:16px; --radius-sm:8px; --radius-lg:24px;
+  --shadow:0 12px 40px rgba(100,50,0,.15);
+  --font-head:'Montserrat','Helvetica Neue',Arial,sans-serif;
+  --font-body:'Lato','Helvetica Neue',Arial,sans-serif;
+  --dur:.28s; --ease:cubic-bezier(.16,1,.3,1);
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#161412; --surface:rgba(255,245,235,.05); --surface-2:rgba(255,245,235,.09);
+    --fg:#F2EEE9; --fg-muted:#B0A79E; --fg-faint:#8A817A;
+    --hair:rgba(255,180,110,.24); --hair-2:rgba(255,180,110,.13);
+    --shadow:0 12px 40px rgba(0,0,0,.5);
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--fg); font-family:var(--font-body);
+  font-size:17px; line-height:1.55; -webkit-font-smoothing:antialiased;
+  padding:0 20px 80px;
+}
+.wrap{max-width:720px;margin:0 auto}
+h1,h2,h3,.h{font-family:var(--font-head);font-weight:700;letter-spacing:-.01em;line-height:1.2;margin:0}
+h1{font-size:clamp(28px,6vw,40px)}
+h2{font-size:clamp(21px,4vw,26px)}
+h3{font-size:17px;text-transform:uppercase;letter-spacing:.08em;color:var(--fg-muted);font-weight:700}
+p{margin:0 0 16px}
+.muted{color:var(--fg-muted)}
+.faint{color:var(--fg-faint);font-size:14px}
+.eyebrow{font-family:var(--font-head);font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--primary);margin:0 0 12px}
+header.top{padding:36px 0 8px;border-bottom:1px solid var(--hair-2);margin-bottom:32px}
+header.top .rule{width:44px;height:4px;background:var(--accent);border-radius:2px;margin:0 0 18px}
+.card{background:var(--surface);border:1px solid var(--hair-2);border-radius:var(--radius);padding:24px}
+.stack>*+*{margin-top:14px}
+.spacer{height:28px}
+
+button,.btn{font-family:var(--font-head);font-size:16px;font-weight:600;cursor:pointer;
+  border-radius:var(--radius-sm);border:1px solid var(--hair);background:var(--surface);
+  color:var(--fg);padding:14px 20px;transition:all var(--dur) var(--ease);text-align:left;
+  display:inline-block;text-decoration:none}
+button:hover,.btn:hover{background:var(--surface-2);border-color:var(--primary)}
+button:disabled,.btn:disabled{opacity:.45;cursor:not-allowed}
+button:disabled:hover{background:var(--surface);border-color:var(--hair)}
+.btn-primary{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+.btn-primary:hover{background:var(--accent);filter:brightness(1.08);border-color:transparent}
+.btn-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px;align-items:center}
+.btn-block{display:block;width:100%}
+.link{background:none;border:none;color:var(--fg-muted);text-decoration:underline;
+  padding:8px 0;font-size:15px;font-family:var(--font-body);font-weight:400}
+.link:hover{background:none;border:none;color:var(--primary)}
+
+label{display:block;font-family:var(--font-head);font-weight:600;font-size:14px;margin:0 0 8px}
+input[type=text],textarea{width:100%;font-family:var(--font-body);font-size:17px;color:var(--fg);
+  background:var(--bg);border:1px solid var(--hair);border-radius:var(--radius-sm);padding:13px 14px}
+input[type=text]:focus,textarea:focus{outline:2px solid var(--primary);outline-offset:1px;border-color:transparent}
+textarea{min-height:150px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:15px;line-height:1.7}
+
+/* progress */
+.prog{display:flex;align-items:center;gap:14px;margin-bottom:28px}
+.prog .bar{flex:1;height:6px;background:var(--surface-2);border-radius:3px;overflow:hidden}
+.prog .bar i{display:block;height:100%;background:var(--accent);border-radius:3px;transition:width var(--dur) var(--ease)}
+.prog .n{font-family:var(--font-head);font-size:13px;font-weight:700;color:var(--fg-muted);white-space:nowrap}
+
+/* scenario */
+.scenario{font-size:clamp(19px,3.4vw,22px);line-height:1.45;margin:0 0 8px}
+.ask{font-family:var(--font-head);font-weight:700;font-size:15px;color:var(--primary);margin:0 0 20px}
+.opt{display:block;width:100%;margin:0 0 10px;padding:16px 18px;font-family:var(--font-body);
+  font-size:16px;font-weight:400;line-height:1.45;min-height:56px}
+.opt:hover{background:var(--surface-2);border-color:var(--primary)}
+.opt.sel{border-color:var(--primary);background:var(--surface-2);box-shadow:inset 3px 0 0 var(--primary)}
+
+/* code / link display */
+.code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:15px;letter-spacing:.01em;
+  word-break:break-all;background:var(--bg);border:1px dashed var(--primary);
+  border-radius:var(--radius-sm);padding:16px;margin:0 0 12px}
+.invite{background:var(--surface);border-left:3px solid var(--primary);padding:16px 18px;
+  border-radius:0 var(--radius-sm) var(--radius-sm) 0;font-size:15px;line-height:1.6}
+
+/* overview */
+.headline{background:var(--surface);border:1px solid var(--hair);border-radius:var(--radius);
+  padding:30px;margin-bottom:32px;border-top:4px solid var(--primary)}
+.headline .lvl{font-family:var(--font-head);font-size:clamp(26px,6vw,36px);font-weight:700;
+  line-height:1.15;margin:6px 0 10px}
+.avgnum{font-family:var(--font-head);font-weight:700;font-size:clamp(48px,10vw,68px);line-height:1;margin:6px 0 4px}
+.ladder{display:flex;gap:6px;margin:16px 0 6px}
+.ladder .seg{flex:1;height:10px;border-radius:5px;background:var(--surface-2)}
+.ladder .seg.on{background:var(--accent)}
+.ladder-labels{display:flex;justify-content:space-between;gap:4px;font-family:var(--font-head);
+  font-size:10px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;color:var(--fg-faint);margin-bottom:16px}
+.ladder-labels span{flex:1;text-align:center}
+.ladder-labels span:first-child{text-align:left}
+.ladder-labels span:last-child{text-align:right}
+
+/* trait / round rows */
+.traitrow{padding:18px 0;border-bottom:1px solid var(--hair-2)}
+.traitrow:last-child{border-bottom:none}
+.traitrow .nm{font-family:var(--font-head);font-weight:700;font-size:16px;margin-bottom:2px}
+.traitrow .dsc{font-size:14px;color:var(--fg-muted);margin-bottom:12px}
+.gbar{display:grid;grid-template-columns:64px 1fr 42px;align-items:center;gap:10px;margin-bottom:6px}
+.gbar .k{font-family:var(--font-head);font-size:11px;font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--fg-muted);text-align:right}
+.gbar .t{height:14px;background:var(--surface-2);border-radius:7px;overflow:hidden}
+.gbar .t i{display:block;height:100%;border-radius:7px;background:var(--fg-faint)}
+.gbar.self .t i{background:var(--fg-muted)}
+.gbar.others .t i{background:var(--accent)}
+.gbar .v{font-family:var(--font-head);font-size:13px;font-weight:700;text-align:right}
+
+.roundrow{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
+  padding:16px 0;border-bottom:1px solid var(--hair-2)}
+.roundrow:last-child{border-bottom:none}
+.roundrow .d{font-family:var(--font-head);font-weight:700;font-size:16px}
+.roundrow .meta{font-size:13px;color:var(--fg-faint)}
+
+.flag{border-left:3px solid var(--primary);padding:14px 18px;background:var(--surface);
+  border-radius:0 var(--radius-sm) var(--radius-sm) 0;margin-bottom:12px}
+.flag.up{border-left-color:#2E9E5B}
+.flag .t{font-family:var(--font-head);font-weight:700;font-size:15px;margin-bottom:4px}
+.split{border:1px solid var(--hair-2);border-radius:var(--radius);padding:20px;margin-bottom:16px}
+.split .sc{font-size:16px;margin-bottom:14px}
+.split .pair{display:grid;grid-template-columns:1fr;gap:10px}
+.split .box{padding:12px 14px;border-radius:var(--radius-sm);background:var(--surface);font-size:15px}
+.split .box b{display:block;font-family:var(--font-head);font-size:11px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--fg-muted);margin-bottom:4px}
+.split .box.o{border-left:3px solid var(--primary)}
+.move{display:flex;gap:14px;padding:16px 0;border-bottom:1px solid var(--hair-2)}
+.move:last-child{border-bottom:none}
+.move .num{font-family:var(--font-head);font-weight:700;font-size:26px;color:var(--primary);
+  line-height:1;min-width:32px}
+.move .ref{font-family:var(--font-head);font-size:12px;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--fg-faint);margin-top:6px}
+.err{border-left:3px solid #C0392B;background:var(--surface);padding:12px 16px;
+  border-radius:0 var(--radius-sm) var(--radius-sm) 0;margin-bottom:16px;font-size:15px}
+.pill{display:inline-block;font-family:var(--font-head);font-size:12px;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;background:var(--surface-2);color:var(--fg-muted);
+  border-radius:20px;padding:5px 12px;margin:0 6px 6px 0}
+@media(min-width:600px){ .split .pair{grid-template-columns:1fr 1fr} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="rule"></div>
+    <div class="eyebrow">Developing the Leader Within You 2.0</div>
+    <h1>Leadership 360</h1>
+  </header>
+  <main id="app"></main>
+</div>
+
+<script>
+/* Real backend — no data ever leaves the browser in a copy/paste code anymore. */
+const API_BASE = "https://1g9ewfu8dc.execute-api.us-east-1.amazonaws.com";
+
+/* ============================================================================
+   ITEM BANK — edit scenario and option wording freely.
+   `s` is the maturity score (1–5) and is never shown or implied to the user.
+   `w` maps the item onto the five Levels of Leadership (used only for the
+   report's one-line overview); `tw` maps it onto named traits, one per book
+   chapter — this is the report's main breakdown. `ch` lists the same
+   chapter(s) as `tw`'s keys and drives the report's "next moves" lookup.
+   Both weight objects sum to 1 per item; most items map to a single trait.
+   ========================================================================== */
+const ITEMS = [
+{
+  ch:[2], w:{1:.7,3:.3}, tw:{2:1},
+  self:"You've blocked out this morning for the one piece of work that actually moves the year forward. At 9:10 a colleague appears with something that has to be sorted today.",
+  other:"{N} has blocked out the morning for the one piece of work that actually moves the year forward. At 9:10 a colleague appears with something that has to be sorted today.",
+  opts:[
+    {t:"Drops the morning's work and deals with it. Someone asked, and it is genuinely urgent.",s:1},
+    {t:"Handles it quickly, then tries to salvage what is left of the morning.",s:2},
+    {t:"Asks how long it can wait, and books it into the afternoon.",s:3},
+    {t:"Asks who else could own it, and hands it over with what they need to succeed.",s:4},
+    {t:"Protects the morning. This kind of interruption has already been designed out of most weeks.",s:5}
+  ]
+},
+{
+  ch:[2], w:{1:.6,3:.4}, tw:{2:1},
+  self:"A well-run organisation invites you onto a new working group. It is a real opportunity, the people are good, and it has nothing to do with your top three priorities this year.",
+  other:"A well-run organisation invites {N} onto a new working group. It is a real opportunity, the people are good, and it has nothing to do with {N}'s top three priorities this year.",
+  opts:[
+    {t:"Says yes. Opportunities like this do not come round twice.",s:1},
+    {t:"Says yes, then quietly struggles to fit it around everything else.",s:2},
+    {t:"Asks for time to think, and says yes to a smaller version of it.",s:3},
+    {t:"Declines, and says what they are saying yes to instead.",s:4},
+    {t:"Declines, and puts forward someone on the team for whom it would be a stretch worth having.",s:5}
+  ]
+},
+{
+  ch:[9], w:{1:.7,5:.3}, tw:{9:1},
+  self:"There is a standing commitment in your week that nobody would notice disappearing — the numbers review, the one-to-one with the quietest person on your team, the reading hour. A brutal week hits.",
+  other:"There is a standing commitment in {N}'s week that nobody would notice disappearing — the numbers review, the one-to-one with the quietest person on the team, the reading hour. A brutal week hits.",
+  opts:[
+    {t:"It goes. It is the obvious thing to drop when the week is full.",s:1},
+    {t:"It gets pushed, and picked up again once things settle.",s:2},
+    {t:"It gets shortened, but it still happens.",s:3},
+    {t:"It happens as normal. It is booked like anything else in the diary.",s:4},
+    {t:"It happens as normal, and the team have noticed that it always does.",s:5}
+  ]
+},
+{
+  ch:[9,3], w:{1:.4,5:.6}, tw:{3:.6,9:.4},
+  self:"You come out of a meeting with senior leadership and walk straight into a meeting with your team about the same subject.",
+  other:"{N} comes out of a meeting with senior leadership and walks straight into a meeting with the team about the same subject.",
+  opts:[
+    {t:"The two versions are quite different. Each room hears what it needs to hear.",s:1},
+    {t:"The message is the same, but the tone shifts a lot depending on the room.",s:2},
+    {t:"Mostly consistent, though the harder detail only really gets said upwards.",s:3},
+    {t:"Same message, same detail, both rooms.",s:4},
+    {t:"Same message, same detail — and the uncomfortable part gets said in the room where it costs them most.",s:5}
+  ]
+},
+{
+  ch:[7], w:{2:.7,4:.3}, tw:{7:1},
+  self:"Someone who joined your team six weeks ago is visibly out of their depth. They have not asked for help.",
+  other:"Someone who joined {N}'s team six weeks ago is visibly out of their depth. They have not asked for help.",
+  opts:[
+    {t:"Waits. Asking for help is part of the job, and they will get there.",s:1},
+    {t:"Tightens up the instructions and checks the work more closely.",s:2},
+    {t:"Asks how they are finding it at the next scheduled catch-up.",s:3},
+    {t:"Goes to them, names what they have noticed without judgement, and asks what would help.",s:4},
+    {t:"Already knows what they are struggling with, because they have been asking what this job is like from where that person sits.",s:5}
+  ]
+},
+{
+  ch:[7], w:{2:.8,5:.2}, tw:{7:1},
+  self:"There is one person you work with regularly whom you just do not warm to. Nothing has gone wrong. The chemistry is not there.",
+  other:"There is one person {N} works with regularly whom they just do not warm to. Nothing has gone wrong. The chemistry is not there.",
+  opts:[
+    {t:"Keeps it professional, and keeps the contact to a minimum.",s:1},
+    {t:"Is perfectly civil, and gets the work done through other people where possible.",s:2},
+    {t:"Makes an effort to be fair, and is careful not to let it show.",s:3},
+    {t:"Has gone looking for what that person is good at, and puts them in front of it.",s:4},
+    {t:"Has spent enough time understanding how things look from where that person stands that their view of them has changed.",s:5}
+  ]
+},
+{
+  ch:[6], w:{2:.7,3:.3}, tw:{6:1},
+  self:"Nothing is badly wrong, but a low-grade grumbling has settled over your team. It shows up in side conversations more than in meetings.",
+  other:"Nothing is badly wrong, but a low-grade grumbling has settled over {N}'s team. It shows up in side conversations more than in meetings.",
+  opts:[
+    {t:"Leaves it. Every team grumbles, and it passes.",s:1},
+    {t:"Tells the team to focus on the positives.",s:2},
+    {t:"Works out where it is coming from and has a quiet word with that person.",s:3},
+    {t:"Names it openly with the team and asks what is actually behind it.",s:4},
+    {t:"Is consistently the first to say out loud what is working, asks people what they would change, then changes one of them.",s:5}
+  ]
+},
+{
+  ch:[6], w:{2:.5,5:.5}, tw:{6:1},
+  self:"A decision you pushed for has clearly not worked. It is visible, and other people have paid some of the cost.",
+  other:"A decision {N} pushed for has clearly not worked. It is visible, and other people have paid some of the cost.",
+  opts:[
+    {t:"Explains the circumstances that made it the right call at the time.",s:1},
+    {t:"Accepts that it did not work, and moves the conversation on to the fix.",s:2},
+    {t:"Owns it privately with their own leader, and keeps it low-key with the team.",s:3},
+    {t:"Says plainly to the team that it was their call and it was wrong.",s:4},
+    {t:"Says it was their call, says what they got wrong, and says what they will do differently — in front of the people who paid for it.",s:5}
+  ]
+},
+{
+  ch:[5], w:{3:.7,1:.3}, tw:{5:1},
+  self:"A problem lands that sits between two teams. It is nobody's job, and it is getting worse.",
+  other:"A problem lands that sits between two teams. It is nobody's job, and it is getting worse.",
+  opts:[
+    {t:"Escalates it. Someone above needs to decide who owns this.",s:1},
+    {t:"Raises it with the other team and waits to see what they do.",s:2},
+    {t:"Takes it on, and works it out alone.",s:3},
+    {t:"Gets the right people in a room, and they leave with an owner and a first step.",s:4},
+    {t:"Flagged this one weeks ago, before it was a problem. The fix is already running.",s:5}
+  ]
+},
+{
+  ch:[5], w:{3:.6,4:.4}, tw:{5:1},
+  self:"The same problem has come back for the fourth time this year. Each time, the team patches it and moves on.",
+  other:"The same problem has come back for the fourth time this year. Each time, the team patches it and moves on.",
+  opts:[
+    {t:"Patches it again. It works, and there are bigger things to deal with.",s:1},
+    {t:"Patches it, and adds it to the list of things to look at properly one day.",s:2},
+    {t:"Sets aside time to work out the real cause themselves.",s:3},
+    {t:"Asks the team what is actually causing this, and picks from the options they come back with.",s:4},
+    {t:"Hands the whole thing to someone on the team to solve, and backs the answer they come up with.",s:5}
+  ]
+},
+{
+  ch:[4], w:{3:.6,2:.4}, tw:{4:1},
+  self:"A change you have been planning for months is announced at the team meeting. Two of your most experienced people push back hard, and the room goes quiet.",
+  other:"A change {N} has been planning for months is announced at the team meeting. Two of the most experienced people push back hard, and the room goes quiet.",
+  opts:[
+    {t:"Restates the decision and the reasons for it, and moves the meeting on.",s:1},
+    {t:"Defends the plan point by point until the objections stop.",s:2},
+    {t:"Acknowledges the pushback and offers to talk it through one to one afterwards.",s:3},
+    {t:"Stops the agenda, asks the two what they would be losing if this went ahead, and lets the room hear the answer.",s:4},
+    {t:"Had already met both of them before the announcement. The meeting is where they help carry it.",s:5}
+  ]
+},
+{
+  ch:[4], w:{3:.7,5:.3}, tw:{4:1},
+  self:"Three months into a change, the energy has gone. Results have dipped, which everyone was warned about, and people are asking whether it is worth continuing.",
+  other:"Three months into a change, the energy has gone. Results have dipped, which everyone was warned about, and people are asking whether it is worth continuing.",
+  opts:[
+    {t:"Pushes harder. The plan was right, and people need to see it through.",s:1},
+    {t:"Quietly scales the change back to something less disruptive.",s:2},
+    {t:"Reassures people that the dip was expected, and holds the line.",s:3},
+    {t:"Finds the parts that are working, makes them visible, and celebrates them by name.",s:4},
+    {t:"Shows the team the progress they cannot see from where they are standing, and is honest about what is still ahead.",s:5}
+  ]
+},
+{
+  ch:[10], w:{4:.8,2:.2}, tw:{10:1},
+  self:"One of your strongest people asks for a piece of work that is genuinely above where they are today. They might not pull it off.",
+  other:"One of {N}'s strongest people asks for a piece of work that is genuinely above where they are today. They might not pull it off.",
+  opts:[
+    {t:"Says not yet, and gives them something closer to their level.",s:1},
+    {t:"Gives it to them and lets them sink or swim.",s:2},
+    {t:"Gives it to them, and stays close enough to catch it if it goes wrong.",s:3},
+    {t:"Gives it to them, and puts regular time in the diary to work through it together.",s:4},
+    {t:"Gives it to them, works through it with them, and lets them take it to the leadership team themselves.",s:5}
+  ]
+},
+{
+  ch:[10], w:{4:.7,1:.3}, tw:{10:1},
+  self:"An unusually quiet week appears in your diary. Two meetings cancel and a deadline moves.",
+  other:"An unusually quiet week appears in {N}'s diary. Two meetings cancel and a deadline moves.",
+  opts:[
+    {t:"Clears the backlog. It is the first chance in months.",s:1},
+    {t:"Gets ahead on next month's work.",s:2},
+    {t:"Takes some of it back. The year has been long enough already.",s:3},
+    {t:"Uses it to think, and comes out having decided something the team needed decided.",s:4},
+    {t:"Spends it on the two people they are developing. That is where the time was always going to go.",s:5}
+  ]
+},
+{
+  ch:[8,3], w:{5:.5,4:.3,3:.2}, tw:{8:.7,3:.3},
+  self:"In a one-to-one, someone asks you directly: where is all this actually going? What are we building?",
+  other:"In a one-to-one, someone asks {N} directly: where is all this actually going? What are we building?",
+  opts:[
+    {t:"Gives them the targets, and what is expected this quarter.",s:1},
+    {t:"Repeats the organisation's strategy as it was handed down.",s:2},
+    {t:"Explains where the team is heading over the next couple of years.",s:3},
+    {t:"Paints the picture clearly enough that the person could describe it to someone else.",s:4},
+    {t:"Paints the picture, then asks that person where they see themselves in it.",s:5}
+  ]
+}
+];
+
+/* Levels power only the report's one-line overview sentence + ladder now. */
+const LEVELS = {
+  1:{name:"Position",           sub:"People follow because they have to."},
+  2:{name:"Permission",         sub:"People follow because they want to."},
+  3:{name:"Production",         sub:"People follow because of what you have done for the organisation."},
+  4:{name:"People Development", sub:"People follow because of what you have done for them."},
+  5:{name:"Pinnacle",           sub:"People follow because of who you are and what you represent."}
+};
+
+/* Traits are the report's main breakdown — one per chapter. */
+const TRAITS = {
+  2:{name:"Priorities",       sub:"What you choose to spend your best time and energy on"},
+  3:{name:"Character",        sub:"Whether people get the same version of you in every room"},
+  4:{name:"Leading Change",   sub:"How you bring people with you when things must move"},
+  5:{name:"Problem Solving",  sub:"How the team's stuck points actually get unstuck"},
+  6:{name:"Attitude",         sub:"The posture you bring when things go wrong"},
+  7:{name:"Serving People",   sub:"Whether the people around you feel led or managed"},
+  8:{name:"Vision",           sub:"Whether people can see where this is going, and their place in it"},
+  9:{name:"Self-Discipline",  sub:"Whether your standards hold when nobody would notice if they didn't"},
+ 10:{name:"Personal Growth",  sub:"Whether you and the people you lead are still getting better"}
+};
+
+const ACTIONS = {
+  2:{ref:"Chapter 2 — Priorities",   t:"List everything currently on your plate and score each one for Required, Return and Reward. Hand back the lowest-scoring third."},
+  3:{ref:"Chapter 3 — Character",    t:"Write your non-negotiables — the lines you will not cross. Then name the one place your team would say you crossed one."},
+  4:{ref:"Chapter 4 — Change",       t:"Before your next change, write two lists: who needs to get behind this to make it fly, and who actually has to fly it. Talk to both before you announce."},
+  5:{ref:"Chapter 5 — Problem Solving",t:"On the next problem that lands, ask before proposing: who knows the most about this, who wants to tackle it, who needs to buy in, and how long will that take?"},
+  6:{ref:"Chapter 6 — Attitude",     t:"Start a gratitude journal, and pick one place to fail on purpose this week."},
+  7:{ref:"Chapter 7 — Serving People",t:"Ask the people you lead what it is like to be on the other side of the table from you. Then do not defend the answer."},
+  8:{ref:"Chapter 8 — Vision",       t:"Answer the five vision questions — look within, behind, around, above and ahead — then paint the picture for one person this week."},
+  9:{ref:"Chapter 9 — Self-Discipline",t:"Pick the one area where you have lost your grip. Name the temptation to avoid, and the price you will pay now to play later."},
+ 10:{ref:"Chapter 10 — Personal Growth",t:"Write your Rule of 5 — the five things you will do daily to grow — and name the two people you are investing in rather than just spending time with."}
+};
+
+const ROLE_SHORT = {S:"Self",M:"Manager",P:"Peers",D:"Direct reports",O:"Others"};
+const LEVEL_KEYS = [1,2,3,4,5];
+const TRAIT_KEYS = [2,3,4,5,6,7,8,9,10];
+
+// THRESHOLD: minimum weighted-mean score (1-5) a level must clear to count as
+// "held" for Maxwell's floor rule — set above the scale midpoint (3) so a
+// level must be clearly, not just narrowly, endorsed.
+const THRESHOLD = 3.5;
+// GAP: minimum self-vs-others difference treated as a real blind spot /
+// hidden strength rather than ordinary rater noise on a 5-point scale.
+const GAP = 0.75;
+// SPLIT_CUTOFF: only surface scenarios where self and the raters' modal
+// answer differ by a full maturity point or more — smaller gaps are within
+// normal rater disagreement and aren't worth spotlighting.
+const SPLIT_CUTOFF = 1;
+
+/* ---------------------------------------------------------------- scoring */
+function scoresFor(ans, field, keys){
+  const out={};
+  keys.forEach(k=>{
+    let num=0,den=0;
+    ITEMS.forEach((it,i)=>{
+      const w=it[field][k]; if(!w) return;
+      num += w*it.opts[ans[i]].s; den += w;
+    });
+    out[k]= den ? num/den : 0;
+  });
+  return out;
+}
+function levelScores(ans){ return scoresFor(ans,'w',LEVEL_KEYS); }
+function traitScores(ans){ return scoresFor(ans,'tw',TRAIT_KEYS); }
+function consolidatedLevel(scores){
+  let f=0;
+  for(let L=1;L<=5;L++){ if(scores[L]>=THRESHOLD) f=L; else break; }
+  return f;
+}
+function mean(a){ return a.length ? a.reduce((x,y)=>x+y,0)/a.length : 0; }
+
+// Tie-break: among options tied for the most rater votes, prefer the one
+// with the highest maturity score, so a tie never silently favors the
+// harshest reading (ascending-key sort would otherwise always resolve a
+// tie toward the lowest-scored option).
+function modalOption(counts, opts){
+  const keys = Object.keys(counts);
+  let best = keys[0];
+  keys.forEach(k=>{
+    if(counts[k] > counts[best]) best = k;
+    else if(counts[k] === counts[best] && opts[k].s > opts[best].s) best = k;
+  });
+  return best;
+}
+
+function floorSentence(levels){
+  const lvl = consolidatedLevel(levels);
+  if(lvl===0) return "The people around you do not yet consistently experience the basics of Level 1 — the priorities you hold and the discipline you keep. Everything above it is built on that, so that is where the work is.";
+  if(lvl===5) return "People consistently experience you at every level, including Pinnacle — leading beyond yourself and the organisation. That's a standard to keep, not a box to check.";
+  return `You consistently clear Level ${lvl} · ${LEVELS[lvl].name}. Level ${lvl+1} · ${LEVELS[lvl+1].name} is where it gets inconsistent — that's the next climb.`;
+}
+function ladder(consolidated){
+  return `<div class="ladder">${[1,2,3,4,5].map(L=>
+    `<div class="seg ${L<=consolidated?'on':''}" title="Level ${L} · ${LEVELS[L].name}"></div>`).join("")}</div>
+  <div class="ladder-labels"><span>Position</span><span>Permission</span><span>Production</span><span>People Dev.</span><span>Pinnacle</span></div>`;
+}
+
+/* ----------------------------------------------------------------- fetch */
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+async function api(method, path, body){
+  const opts = { method, headers:{} };
+  if(body!==undefined){ opts.headers["content-type"]="application/json"; opts.body=JSON.stringify(body); }
+  for(let attempt=0; attempt<3; attempt++){
+    try{
+      const res = await fetch(API_BASE+path, opts);
+      if(res.status>=500 && attempt<2){ await sleep(300*(attempt+1)+Math.random()*200); continue; }
+      let data={};
+      try{ data = await res.json(); }catch(e){}
+      if(!res.ok) return { ok:false, status:res.status, error:data.error||"error" };
+      return { ok:true, data };
+    }catch(e){
+      if(attempt<2){ await sleep(300*(attempt+1)+Math.random()*200); continue; }
+      return { ok:false, status:0, error:"network_error" };
+    }
+  }
+  return { ok:false, status:0, error:"network_error" };
+}
+
+/* ------------------------------------------------------------------- copy */
+function copy(text, btn, label){
+  const done=()=>{ btn.textContent="Copied"; setTimeout(()=>btn.textContent=label,1600); };
+  const failed=()=>{ btn.textContent="Couldn't copy — select manually"; setTimeout(()=>btn.textContent=label,2400); };
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(text).then(done, ()=>fallbackCopy(text,done,failed));
+  } else {
+    fallbackCopy(text,done,failed);
+  }
+}
+function fallbackCopy(text, done, failed){
+  const ta=document.createElement("textarea");
+  ta.value=text; ta.style.position="fixed"; ta.style.opacity="0"; ta.style.top="0"; ta.style.left="0";
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  let ok=false;
+  try{ ok=document.execCommand("copy"); }catch(e){ ok=false; }
+  document.body.removeChild(ta);
+  if(ok) done(); else failed();
+}
+
+/* ------------------------------------------------------------------- view */
+const app = document.getElementById("app");
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let state = {};
+
+function render(){
+  const fn = {
+    landing:vLanding, setup:vSetup, quiz:vQuiz, submitting:vSubmitting,
+    "submit-error":vSubmitError, done:vDone, dashboard:vDashboard, report:vReport
+  }[state.screen];
+  app.innerHTML = fn();
+  bind();
+}
+function fail(msg){
+  const e=document.getElementById("err");
+  if(e) e.innerHTML=`<div class="err">${msg}</div>`;
+}
+function fmtDate(iso){
+  try{ return new Date(iso).toLocaleDateString(undefined,{year:"numeric",month:"short",day:"numeric"}); }
+  catch(e){ return iso; }
+}
+function shuffle(a){
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+
+/* landing */
+function vLanding(){
+  return `
+  <p class="scenario">Fifteen situations. No right answers, no scores on screen — just what this leader would most typically do.</p>
+  <p class="muted">About ten minutes.</p>
+  <div class="spacer"></div>
+  <button class="btn-block btn-primary" data-start-self>Assess myself
+    <span class="faint" style="display:block;font-weight:400;font-family:var(--font-body);margin-top:4px;color:inherit;opacity:.8">Starts a new round you can invite raters to.</span></button>`;
+}
+
+/* setup */
+function vSetup(){
+  const self = state.mode==="self";
+  const revise = state.selfKind==="revise";
+  const backHref = self && state.urlCtx.leaderId ? `?leader=${state.urlCtx.leaderId}` : (self ? location.pathname : null);
+  return `
+  <h2>${revise ? "Revise your self-assessment" : "Before you start"}</h2>
+  <div class="spacer"></div>
+  ${ self ? `
+    <label for="who">Your first name</label>
+    <input type="text" id="who" maxlength="24" value="${esc(state.name||"")}" placeholder="First name">
+    <div class="spacer"></div>
+    <label for="nm">Your initials <span class="faint">(optional, shown only to you)</span></label>
+    <input type="text" id="nm" maxlength="6" value="${esc(state.initials||"")}" placeholder="e.g. JZ">
+  ` : `
+    <p class="muted">Giving feedback on <b>${esc(state.urlCtx.forName||"this leader")}</b>.</p>
+    <div class="spacer"></div>
+    <label>Your relationship to them</label>
+    ${["M","P","D","O"].map(r=>`<button class="opt role ${state.role===r?"sel":""}" data-role="${r}">${
+      r==="M"?"I am their manager": r==="P"?"We are peers": r==="D"?"They lead me":"Something else"}</button>`).join("")}
+    <div class="spacer"></div>
+    <label for="nm">Your initials <span class="faint">(optional — leave blank to stay anonymous)</span></label>
+    <input type="text" id="nm" maxlength="6" value="${esc(state.initials||"")}" placeholder="Optional">
+  `}
+  <div id="err"></div>
+  ${ !self && state.roundCheck==="notfound" ? `<div class="err">This link doesn't look right — double check it with whoever sent it.</div>` : "" }
+  ${ !self && state.roundCheck==="pending" ? `<p class="faint">Checking link…</p>` : "" }
+  <div class="btn-row">
+    <button class="btn-primary" data-start ${!self && state.roundCheck!=="ok" ? "disabled":""}>Start</button>
+    ${ backHref ? `<a class="link" href="${backHref}">Back</a>` : "" }
+  </div>`;
+}
+
+/* quiz */
+function vQuiz(){
+  const i = state.q, it = ITEMS[i];
+  const stem = state.mode==="self" ? it.self : it.other.replace(/\{N\}/g, esc(state.urlCtx.forName));
+  const ask = state.mode==="self" ? "What do you most typically do?"
+                                  : `What does ${esc(state.urlCtx.forName)} most typically do?`;
+  const order = state.order[i];
+  return `
+  <div class="prog"><span class="n">${i+1} of ${ITEMS.length}</span>
+    <span class="bar"><i style="width:${(i)/ITEMS.length*100}%"></i></span></div>
+  <p class="scenario">${esc(stem)}</p>
+  <p class="ask">${ask}</p>
+  ${order.map(o=>`<button class="opt ${state.ans[i]===o?"sel":""}" data-opt="${o}">${esc(it.opts[o].t)}</button>`).join("")}
+  ${ i>0 ? `<button class="link" data-back>Back</button>` : "" }`;
+}
+
+/* submitting / error */
+function vSubmitting(){ return `<p class="scenario">Submitting…</p>`; }
+function vSubmitError(){
+  return `
+  <h2>Something went wrong</h2>
+  <p class="muted">Your answers are still here — that looked like a connection hiccup, not a lost response.</p>
+  <div class="btn-row"><button class="btn-primary" data-retry-submit>Try again</button></div>`;
+}
+
+/* done */
+function vDone(){
+  if(state.mode==="rate"){
+    return `
+    <h2>Done — thank you</h2>
+    <p class="muted">Your feedback has been recorded. Nothing more to send.</p>
+    <div class="spacer"></div>
+    <a class="btn" href="?round=${state.urlCtx.roundId}&report=1">View the live report</a>`;
+  }
+  if(state.selfKind==="revise"){
+    return `
+    <h2>Updated</h2>
+    <p class="muted">Your self-assessment has been revised for this round.</p>
+    <div class="spacer"></div>
+    <a class="btn btn-primary" href="?round=${state.urlCtx.roundId}&report=1">View the report</a>`;
+  }
+  const origin = location.origin + location.pathname;
+  const leaderUrl = origin + "?leader=" + state.urlCtx.leaderId;
+  const inviteUrl = origin + "?round=" + state.urlCtx.roundId + "&for=" + encodeURIComponent(state.name);
+  const inviteBody = `I'm doing a leadership 360 as part of Developing the Leader Within You 2.0, and I'd value your honest read of how I actually lead. It's fifteen short scenarios, about ten minutes.\n\n${inviteUrl}`;
+  return `
+  <h2>Done — thank you</h2>
+  <p class="muted">Your self-assessment is recorded.</p>
+  <div class="spacer"></div>
+  <label>Your link — bookmark this, it's how you'll always find your way back</label>
+  <div class="code">${esc(leaderUrl)}</div>
+  <div class="btn-row" style="margin-top:0"><button data-copy="${esc(leaderUrl)}">Copy my link</button></div>
+
+  <div class="spacer"></div>
+  <h3>Now invite your raters</h3>
+  <div style="height:10px"></div>
+  <p class="muted">Send this link to each person giving feedback — it takes them straight to the fifteen scenarios, no code to send back.</p>
+  <div class="code">${esc(inviteUrl)}</div>
+  <div class="btn-row" style="margin-top:0">
+    <button data-copy="${esc(inviteUrl)}">Copy invite link</button>
+    <a class="btn" href="mailto:?subject=${encodeURIComponent("Quick favor — leadership feedback")}&body=${encodeURIComponent(inviteBody)}">Send by email</a>
+  </div>
+  <p class="faint" style="margin-top:20px">Four to six raters gives you a usable picture. Aim for a mix: your manager, two or three peers, and at least two people you lead.</p>
+
+  <div class="spacer"></div>
+  <div class="btn-row"><a class="btn btn-primary" href="?round=${state.urlCtx.roundId}&report=1">View live report</a></div>`;
+}
+
+/* dashboard */
+function vDashboard(){
+  if(state.dash.phase==="loading") return `<p class="muted">Loading…</p>`;
+  if(state.dash.phase==="error") return `
+    <h2>Couldn't find that</h2>
+    <p class="muted">This link doesn't match anything on file.</p>
+    <a class="btn btn-primary" href="${location.pathname}">Start a self-assessment</a>`;
+  const d = state.dash.data;
+  return `
+  <h2>${d.name?esc(d.name)+"'s":"Your"} assessments</h2>
+  <p class="muted">Meant to be retaken every few months — this is where you'll always find your history.</p>
+  <div class="spacer"></div>
+  <div class="card">
+    ${d.rounds.map((r,i)=>`
+      <div class="roundrow">
+        <div>
+          <div class="d">${fmtDate(r.createdAt)}</div>
+          ${i===0?`<div class="meta">Most recent</div>`:""}
+        </div>
+        <div class="btn-row" style="margin-top:0">
+          <a class="btn" href="?round=${r.roundId}&report=1">View report</a>
+          ${i===0?`<a class="btn" href="?round=${r.roundId}&revise=1">Revise</a>`:""}
+        </div>
+      </div>`).join("")}
+  </div>
+  <div class="spacer"></div>
+  <a class="btn btn-primary btn-block" href="?leader=${d.leaderId}&newround=1">Start a new round</a>`;
+}
+
+/* report */
+function vReport(){
+  if(state.report.phase==="loading") return `<p class="muted">Loading report…</p>`;
+  if(state.report.phase==="error") return `
+    <h2>Couldn't load this report</h2>
+    <p class="muted">The link may be wrong, or the connection dropped.</p>
+    <button class="btn-primary" data-refresh-report>Try again</button>`;
+  return reportHTML(state.report.data);
+}
+
+function reportHTML(d){
+  const self = d.self;
+  const raters = d.raters;
+  const selfLevels = self ? levelScores(self.ans) : null;
+  const selfTraits = self ? traitScores(self.ans) : null;
+  const rLevelScores = raters.map(r=>levelScores(r.ans));
+  const rTraitScores = raters.map(r=>traitScores(r.ans));
+
+  const othersLevels = {}; LEVEL_KEYS.forEach(L=> othersLevels[L] = raters.length ? mean(rLevelScores.map(s=>s[L])) : 0);
+  const othersTraits = {}; TRAIT_KEYS.forEach(k=> othersTraits[k] = raters.length ? mean(rTraitScores.map(s=>s[k])) : 0);
+  const consolidated = raters.length ? consolidatedLevel(othersLevels) : 0;
+  const overviewAvg = raters.length ? mean(LEVEL_KEYS.map(L=>othersLevels[L])) : 0;
+
+  const groups = {};
+  raters.forEach((r,i)=>{ (groups[r.role]=groups[r.role]||[]).push(rTraitScores[i]); });
+  const shownGroups = Object.keys(groups).filter(k=>groups[k].length>=2);
+
+  const blind=[], hidden=[];
+  if(selfTraits && raters.length) TRAIT_KEYS.forEach(k=>{
+    const dlt = selfTraits[k]-othersTraits[k];
+    if(dlt>=GAP) blind.push({k,d:dlt});
+    else if(dlt<=-GAP) hidden.push({k,d:-dlt});
+  });
+  blind.sort((a,b)=>b.d-a.d); hidden.sort((a,b)=>b.d-a.d);
+
+  let splits=[];
+  if(self && raters.length) splits = ITEMS.map((it,i)=>{
+    const oScores = raters.map(r=>it.opts[r.ans[i]].s);
+    const counts={}; raters.forEach(r=>counts[r.ans[i]]=(counts[r.ans[i]]||0)+1);
+    const modal = modalOption(counts, it.opts);
+    return { i, gap: it.opts[self.ans[i]].s - mean(oScores),
+             mine: it.opts[self.ans[i]].t, theirs: it.opts[modal].t,
+             agree: counts[modal], of: raters.length };
+  }).filter(x=>Math.abs(x.gap)>=SPLIT_CUTOFF).sort((a,b)=>Math.abs(b.gap)-Math.abs(a.gap)).slice(0,3);
+
+  const weakestTraits = raters.length ? TRAIT_KEYS.slice().sort((a,b)=>othersTraits[a]-othersTraits[b]).slice(0,3) : [];
+
+  const bar = (cls,label,v)=>`<div class="gbar ${cls}"><span class="k">${label}</span>
+    <span class="t"><i style="width:${Math.max(2,(v-1)/4*100)}%"></i></span>
+    <span class="v">${v.toFixed(1)}</span></div>`;
+
+  return `
+  <div class="btn-row" style="margin-bottom:8px">
+    <a class="link" href="?leader=${d.leaderId}">&larr; Your assessments</a>
+    <button class="link" data-refresh-report>Refresh</button>
+  </div>
+
+  <div class="headline">
+    <div class="eyebrow">What the people around you say</div>
+    ${ raters.length===0 ? `
+      <div class="lvl">Waiting on feedback</div>
+      <p class="muted">No one has submitted feedback for this round yet. Share the invite link from your assessments page.</p>
+    ` : `
+      <div class="avgnum">${overviewAvg.toFixed(1)}<span style="font-size:0.35em;font-weight:600;color:var(--fg-muted)"> / 5</span></div>
+      ${ladder(consolidated)}
+      <p class="muted">${floorSentence(othersLevels)}</p>
+    `}
+    <div style="margin-top:14px">
+      ${self?`<span class="pill">Self · 1</span>`:""}
+      ${Object.keys(groups).map(k=>`<span class="pill">${ROLE_SHORT[k]} · ${groups[k].length}</span>`).join("")}
+      ${raters.length===0 ? `<span class="pill">No responses yet</span>`:""}
+    </div>
+  </div>
+
+  ${ raters.length===0 ? "" : `
+  <h2>Nine traits</h2>
+  <p class="muted">Grounded in the book's own chapters. Their read is the orange bar.</p>
+  ${TRAIT_KEYS.map(k=>`
+    <div class="traitrow">
+      <div class="nm">${TRAITS[k].name}</div>
+      <div class="dsc">${TRAITS[k].sub}</div>
+      ${selfTraits?bar("self","You",selfTraits[k]):""}
+      ${bar("others","Them",othersTraits[k])}
+      ${shownGroups.map(g=>bar("","· "+ROLE_SHORT[g], mean(groups[g].map(s=>s[k])))).join("")}
+    </div>`).join("")}
+
+  ${ selfTraits ? `
+  <div class="spacer"></div>
+  <h2>Where your read and theirs come apart</h2>
+  ${ blind.length===0 && hidden.length===0
+    ? `<p class="muted">No trait differs by more than ${GAP} of a point. How you see yourself and how they see you are broadly the same — which is itself worth knowing.</p>`
+    : "" }
+  ${blind.map(b=>`<div class="flag"><div class="t">Blind spot · ${TRAITS[b.k].name}</div>
+    <div>You rate yourself ${b.d.toFixed(1)} points higher here than the people around you do. This is the gap that costs you the most, because you are not currently looking at it.</div></div>`).join("")}
+  ${hidden.map(h=>`<div class="flag up"><div class="t">Hidden strength · ${TRAITS[h.k].name}</div>
+    <div>They rate you ${h.d.toFixed(1)} points higher here than you rate yourself. You are getting credit you are not claiming — and probably not deliberately repeating.</div></div>`).join("")}
+  ` : `<div class="spacer"></div><p class="muted">This round doesn't have a self-assessment on file, so blind spots can't be compared.</p>`}
+
+  ${ splits.length ? `
+  <div class="spacer"></div>
+  <h2>The sharpest three</h2>
+  <p class="muted">The scenarios where you and they described a different leader.</p>
+  ${splits.map(s=>`
+    <div class="split">
+      <div class="sc">${esc(ITEMS[s.i].self)}</div>
+      <div class="pair">
+        <div class="box"><b>You said</b>${esc(s.mine)}</div>
+        <div class="box o"><b>${s.agree} of ${s.of} of them said</b>${esc(s.theirs)}</div>
+      </div>
+    </div>`).join("")}` : ""}
+
+  <div class="spacer"></div>
+  <h2>Three next moves</h2>
+  <p class="muted">Taken from the chapters behind your lowest-scoring traits.</p>
+  ${weakestTraits.map((c,i)=>`<div class="move"><div class="num">${i+1}</div>
+    <div><div>${esc(ACTIONS[c].t)}</div><div class="ref">${esc(ACTIONS[c].ref)}</div></div></div>`).join("")}
+  `}
+
+  <div class="spacer"></div>
+  <div class="btn-row"><a class="btn" href="?round=${d.roundId}&revise=1">Revise my self-assessment</a></div>`;
+}
+
+/* ------------------------------------------------------------------ binds */
+function bind(){
+  const startSelf = app.querySelector("[data-start-self]");
+  if(startSelf) startSelf.onclick=()=>{
+    state.screen="setup"; state.mode="self"; state.selfKind="new";
+    state.name=state.name||""; state.initials=state.initials||"";
+    render();
+  };
+
+  app.querySelectorAll("[data-role]").forEach(b=>b.onclick=()=>{
+    state.role=b.dataset.role;
+    const nmEl=document.getElementById("nm");
+    if(nmEl) state.initials=nmEl.value;
+    render();
+  });
+
+  const start = app.querySelector("[data-start]");
+  if(start) start.onclick=()=>{
+    const nm=document.getElementById("nm"), who=document.getElementById("who");
+    state.initials=(nm.value||"").replace(/[^A-Za-z0-9 .]/g,"").slice(0,6);
+    if(state.mode==="self"){
+      state.name=(who.value||"").replace(/[^A-Za-z0-9 '.-]/g,"").slice(0,24).trim();
+      if(!state.name) return fail("Please enter your first name.");
+    } else {
+      if(!state.role) return fail("Please say how you know them.");
+    }
+    state.q=0; state.ans=new Array(ITEMS.length).fill(null);
+    state.order=ITEMS.map(it=>shuffle(it.opts.map((_,i)=>i)));
+    state.screen="quiz"; render(); window.scrollTo(0,0);
+  };
+
+  app.querySelectorAll("[data-opt]").forEach(b=>b.onclick=()=>{
+    state.ans[state.q]=Number(b.dataset.opt);
+    if(state.q < ITEMS.length-1){ state.q++; state.screen="quiz"; render(); window.scrollTo(0,0); }
+    else submitCurrentAndFinish();
+  });
+
+  const back = app.querySelector("[data-back]");
+  if(back) back.onclick=()=>{ state.q--; render(); window.scrollTo(0,0); };
+
+  app.querySelectorAll("[data-copy]").forEach(b=>b.onclick=()=>copy(b.dataset.copy, b, b.textContent.trim()));
+
+  const retry = app.querySelector("[data-retry-submit]");
+  if(retry) retry.onclick=()=>state._retry();
+
+  const refresh = app.querySelector("[data-refresh-report]");
+  if(refresh) refresh.onclick=()=>{ state.report={phase:"loading"}; render(); loadReport(); };
+}
+
+/* --------------------------------------------------------------- actions */
+async function submitCurrentAndFinish(){
+  state.screen="submitting"; render();
+  let result;
+  if(state.mode==="self"){
+    if(state.selfKind==="revise"){
+      result = await api("POST", `/round/${state.urlCtx.roundId}/response`,
+        {kind:"self", initials:state.initials, ans:state.ans});
+    } else {
+      result = await api("POST", "/round",
+        {leaderId: state.urlCtx.leaderId||undefined, name: state.name, initials: state.initials, ans: state.ans});
+    }
+  } else {
+    let raterId;
+    try{ raterId = localStorage.getItem("l360_rater_"+state.urlCtx.roundId) || undefined; }catch(e){}
+    result = await api("POST", `/round/${state.urlCtx.roundId}/response`,
+      {kind:"rater", role:state.role, initials:state.initials, ans:state.ans, raterId});
+  }
+  if(!result.ok){ state.screen="submit-error"; state._retry=submitCurrentAndFinish; render(); return; }
+  if(state.mode==="self" && state.selfKind!=="revise"){
+    state.urlCtx.leaderId = result.data.leaderId;
+    state.urlCtx.roundId = result.data.roundId;
+    history.replaceState(null,"","?leader="+state.urlCtx.leaderId);
+  }
+  if(state.mode==="rate" && result.data.raterId){
+    try{ localStorage.setItem("l360_rater_"+state.urlCtx.roundId, result.data.raterId); }catch(e){}
+  }
+  state.doneResult = result.data;
+  state.screen="done"; render(); window.scrollTo(0,0);
+}
+
+async function checkRoundExists(){
+  const r = await api("GET", "/round/"+state.urlCtx.roundId);
+  state.roundCheck = r.ok ? "ok" : "notfound";
+  render();
+}
+async function loadReport(){
+  const r = await api("GET", "/round/"+state.urlCtx.roundId);
+  state.report = r.ok ? {phase:"ready", data:r.data} : {phase:"error"};
+  render();
+}
+async function prefillRevise(){
+  const r = await api("GET", "/round/"+state.urlCtx.roundId);
+  if(r.ok){
+    state.urlCtx.leaderId = r.data.leaderId;
+    if(r.data.self) state.initials = r.data.self.initials;
+  }
+  render();
+}
+async function loadDashboard(){
+  const r = await api("GET", "/leader/"+state.urlCtx.leaderId);
+  state.dash = r.ok ? {phase:"ready", data:r.data} : {phase:"error"};
+  render();
+}
+async function prefillNewRoundName(){
+  const r = await api("GET", "/leader/"+state.urlCtx.leaderId);
+  if(r.ok) state.name = r.data.name;
+  render();
+}
+
+/* ---------------------------------------------------------------- boot */
+function boot(){
+  const p = new URLSearchParams(location.search);
+  const urlCtx = {
+    leaderId: p.get("leader") || null,
+    roundId:  p.get("round")  || null,
+    forName:  p.get("for")    || null,
+  };
+
+  if(urlCtx.roundId && urlCtx.forName){
+    state = {screen:"setup", mode:"rate", urlCtx, roundCheck:"pending", role:null, initials:""};
+    render(); checkRoundExists(); return;
+  }
+  if(urlCtx.roundId && p.get("report")==="1"){
+    state = {screen:"report", urlCtx, report:{phase:"loading"}};
+    render(); loadReport(); return;
+  }
+  if(urlCtx.roundId && p.get("revise")==="1"){
+    state = {screen:"setup", mode:"self", selfKind:"revise", urlCtx, name:"", initials:""};
+    render(); prefillRevise(); return;
+  }
+  if(urlCtx.leaderId && p.get("newround")==="1"){
+    state = {screen:"setup", mode:"self", selfKind:"new", urlCtx, name:"", initials:""};
+    render(); prefillNewRoundName(); return;
+  }
+  if(urlCtx.leaderId){
+    state = {screen:"dashboard", urlCtx, dash:{phase:"loading"}};
+    render(); loadDashboard(); return;
+  }
+  state = {screen:"landing", urlCtx};
+  render();
+}
+boot();
+</script>
+</body>
+</html>
