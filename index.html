@@ -80,13 +80,12 @@ textarea{min-height:150px;font-family:ui-monospace,Menlo,Consolas,monospace;font
   font-size:16px;font-weight:400;line-height:1.45;min-height:56px}
 .opt:hover{background:var(--surface-2);border-color:var(--primary)}
 .opt.sel{border-color:var(--primary);background:var(--surface-2);box-shadow:inset 3px 0 0 var(--primary)}
+.opt.small{display:inline-block;width:auto;min-height:auto;padding:8px 14px;font-size:14px;margin:0 8px 8px 0}
 
 /* code / link display */
 .code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:15px;letter-spacing:.01em;
   word-break:break-all;background:var(--bg);border:1px dashed var(--primary);
   border-radius:var(--radius-sm);padding:16px;margin:0 0 12px}
-.invite{background:var(--surface);border-left:3px solid var(--primary);padding:16px 18px;
-  border-radius:0 var(--radius-sm) var(--radius-sm) 0;font-size:15px;line-height:1.6}
 
 /* overview */
 .headline{background:var(--surface);border:1px solid var(--hair);border-radius:var(--radius);
@@ -94,14 +93,18 @@ textarea{min-height:150px;font-family:ui-monospace,Menlo,Consolas,monospace;font
 .headline .lvl{font-family:var(--font-head);font-size:clamp(26px,6vw,36px);font-weight:700;
   line-height:1.15;margin:6px 0 10px}
 .avgnum{font-family:var(--font-head);font-weight:700;font-size:clamp(48px,10vw,68px);line-height:1;margin:6px 0 4px}
-.ladder{display:flex;gap:6px;margin:16px 0 6px}
-.ladder .seg{flex:1;height:10px;border-radius:5px;background:var(--surface-2)}
-.ladder .seg.on{background:var(--accent)}
-.ladder-labels{display:flex;justify-content:space-between;gap:4px;font-family:var(--font-head);
-  font-size:10px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;color:var(--fg-faint);margin-bottom:16px}
-.ladder-labels span{flex:1;text-align:center}
-.ladder-labels span:first-child{text-align:left}
-.ladder-labels span:last-child{text-align:right}
+
+/* pyramid — stepped tiers, Position (widest) at the base rising to Pinnacle
+   (narrowest) at the apex. Each tier is full-width for its label row so
+   names/scores stay legible regardless of how narrow the bar itself is. */
+.pyr{margin:18px 0 6px}
+.pyr .tier{margin-bottom:10px}
+.pyr .tier .lbl{display:flex;justify-content:space-between;align-items:baseline;
+  font-family:var(--font-head);font-size:13px;font-weight:700;margin-bottom:5px}
+.pyr .tier .lbl .score{color:var(--fg-muted);font-weight:700;font-size:13px}
+.pyr .tier .bar{height:26px;border-radius:6px;background:var(--surface-2);margin:0 auto;
+  transition:background var(--dur) var(--ease)}
+.pyr .tier.on .bar{background:var(--accent)}
 
 /* trait / round rows */
 .traitrow{padding:18px 0;border-bottom:1px solid var(--hair-2)}
@@ -118,10 +121,15 @@ textarea{min-height:150px;font-family:ui-monospace,Menlo,Consolas,monospace;font
 .gbar .v{font-family:var(--font-head);font-size:13px;font-weight:700;text-align:right}
 
 .roundrow{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
-  padding:16px 0;border-bottom:1px solid var(--hair-2)}
+  padding:16px 0;border-bottom:1px solid var(--hair-2);cursor:default}
 .roundrow:last-child{border-bottom:none}
 .roundrow .d{font-family:var(--font-head);font-weight:700;font-size:16px}
 .roundrow .meta{font-size:13px;color:var(--fg-faint)}
+.reviewrow{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;
+  padding:14px 0;border-bottom:1px solid var(--hair-2)}
+.reviewrow:last-child{border-bottom:none}
+.reviewrow .q{font-size:14px;margin-bottom:2px}
+.reviewrow .a{font-weight:600}
 
 .flag{border-left:3px solid var(--primary);padding:14px 18px;background:var(--surface);
   border-radius:0 var(--radius-sm) var(--radius-sm) 0;margin-bottom:12px}
@@ -166,7 +174,7 @@ const API_BASE = "https://1g9ewfu8dc.execute-api.us-east-1.amazonaws.com";
    ITEM BANK — 36 scenarios, four per trait.
    `s` is the maturity score (1–5) and is never shown or implied to the user.
    `w` maps the item onto the five Levels of Leadership (used only for the
-   report's overview score and floor sentence); `tw` maps it onto named traits,
+   report's overview score and pyramid); `tw` maps it onto named traits,
    one per book chapter — the report's main breakdown. `ch` mirrors `tw`'s keys
    and drives the "next moves" lookup. Both weight objects sum to 1 per item.
    Items are interleaved so no two consecutive scenarios share a trait.
@@ -642,7 +650,7 @@ const ITEMS = [
 }
 ];
 
-/* Levels power only the report's one-line overview sentence + ladder now. */
+/* Levels power the report's overview pyramid + score. */
 const LEVELS = {
   1:{name:"Position",           sub:"People follow because they have to."},
   2:{name:"Permission",         sub:"People follow because they want to."},
@@ -676,7 +684,10 @@ const ACTIONS = {
  10:{ref:"Chapter 10 — Personal Growth",t:"Write your Rule of 5 — the five things you will do daily to grow — and name the two people you are investing in rather than just spending time with."}
 };
 
-const ROLE_SHORT = {S:"Self",M:"Manager",P:"Peers",D:"Direct reports",O:"Others"};
+// M/P/D/O = manager/peer/direct-report/other, self-declared by a rater who's
+// comfortable being identified by role. X = prefer not to say.
+const ROLE_LABELS = {M:"I am their manager", P:"We are peers", D:"They lead me", O:"Something else", X:"Prefer not to say"};
+const ROLE_SHORT = {S:"Self",M:"Manager",P:"Peers",D:"Direct reports",O:"Others",X:"Unspecified"};
 const LEVEL_KEYS = [1,2,3,4,5];
 const TRAIT_KEYS = [2,3,4,5,6,7,8,9,10];
 
@@ -695,6 +706,9 @@ const SPLIT_CUTOFF = 1;
 // threshold on most of them; showing all of them buries the signal, so cap
 // the callouts at the widest few and count the rest.
 const FLAG_LIMIT = 3;
+// TAP_DEBOUNCE_MS: ignore a second option tap this soon after a render, so a
+// double-tap or ghost-click on a phone can't blind-answer the next question.
+const TAP_DEBOUNCE_MS = 350;
 
 /* ---------------------------------------------------------------- scoring */
 function scoresFor(ans, field, keys){
@@ -732,16 +746,39 @@ function modalOption(counts, opts){
   return best;
 }
 
+// Subject-agnostic on purpose: this sentence sits under a pyramid whose
+// eyebrow label already says whose read it is (self / a rater / everyone),
+// so it doesn't need to embed "you"/"they" itself.
 function floorSentence(levels){
   const lvl = consolidatedLevel(levels);
-  if(lvl===0) return "The people around you do not yet consistently experience the basics of Level 1 — the priorities you hold and the discipline you keep. Everything above it is built on that, so that is where the work is.";
-  if(lvl===5) return "People consistently experience you at every level, including Pinnacle — leading beyond yourself and the organisation. That's a standard to keep, not a box to check.";
-  return `You consistently clear Level ${lvl} · ${LEVELS[lvl].name}. Level ${lvl+1} · ${LEVELS[lvl+1].name} is where it gets inconsistent — that's the next climb.`;
+  if(lvl===0) return "Level 1 — Position — is not yet consistently held. Everything above it is built on that, so that is where the work is.";
+  if(lvl===5) return "Every level is consistently held, including Pinnacle — leading beyond yourself and the organisation. That's a standard to keep, not a box to check.";
+  return `Level ${lvl} · ${LEVELS[lvl].name} is consistently held. Level ${lvl+1} · ${LEVELS[lvl+1].name} is where it gets inconsistent — that's the next climb.`;
 }
-function ladder(consolidated){
-  return `<div class="ladder">${[1,2,3,4,5].map(L=>
-    `<div class="seg ${L<=consolidated?'on':''}" title="Level ${L} · ${LEVELS[L].name}"></div>`).join("")}</div>
-  <div class="ladder-labels"><span>Position</span><span>Permission</span><span>Production</span><span>People Dev.</span><span>Pinnacle</span></div>`;
+
+// Stepped pyramid: Position (widest) at the base rising to Pinnacle
+// (narrowest) at the apex. Highlighted tiers = held under Maxwell's floor
+// rule. Each tier's label row spans full width so it stays legible on a
+// phone regardless of how narrow that tier's bar is.
+const PYRAMID_WIDTH = {5:"42%",4:"58%",3:"74%",2:"88%",1:"100%"};
+function pyramid(levels, consolidated){
+  return `<div class="pyr">${[5,4,3,2,1].map(L=>`
+    <div class="tier ${L<=consolidated?'on':''}">
+      <div class="lbl"><span>${LEVELS[L].name}</span><span class="score">${levels[L].toFixed(1)}</span></div>
+      <div class="bar" style="width:${PYRAMID_WIDTH[L]}"></div>
+    </div>`).join("")}</div>`;
+}
+
+// Stable (not random-per-render) shuffle so per-response report views don't
+// reveal anything by their display order — seeded from the round id, so it's
+// identical across reloads but unrelated to submission order.
+function hashStr(s){ let h=0; for(let i=0;i<s.length;i++){ h=(h*31+s.charCodeAt(i))|0; } return h>>>0; }
+function seededShuffle(arr, seed){
+  const a = arr.slice();
+  let s = seed>>>0 || 1;
+  const rand = ()=>{ s=(s*1664525+1013904223)>>>0; return s/4294967296; };
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(rand()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
 }
 
 /* ----------------------------------------------------------------- fetch */
@@ -785,6 +822,37 @@ function fallbackCopy(text, done, failed){
   if(ok) done(); else failed();
 }
 
+/* --------------------------------------------------------------- storage */
+// Drafts let a rater/leader resume a 20-minute run after a locked phone, a
+// dropped tab, or an accidental navigation — nothing is lost until a real
+// submit succeeds, at which point the draft is deleted.
+function draftKeyFor(mode, selfKind, roundId){
+  if(mode==="self") return selfKind==="revise" ? `l360_draft_revise_${roundId}` : "l360_draft_new";
+  return `l360_draft_rate_${roundId}`;
+}
+function saveDraft(){
+  try{
+    localStorage.setItem(draftKeyFor(state.mode, state.selfKind, state.urlCtx.roundId), JSON.stringify({
+      ans:state.ans, order:state.order, q:state.q, role:state.role,
+      initials:state.initials, name:state.name, savedAt: Date.now()
+    }));
+  }catch(e){}
+}
+function loadDraft(key){
+  try{
+    const raw = localStorage.getItem(key);
+    if(!raw) return null;
+    const d = JSON.parse(raw);
+    if(!Array.isArray(d.ans) || d.ans.length!==ITEMS.length) return null;
+    if(!Array.isArray(d.order) || d.order.length!==ITEMS.length) return null;
+    return d;
+  }catch(e){ return null; }
+}
+function clearDraft(key){ try{ localStorage.removeItem(key); }catch(e){} }
+function rememberLeader(leaderId){ try{ localStorage.setItem("l360_leader", leaderId); }catch(e){} }
+function recalledLeader(){ try{ return localStorage.getItem("l360_leader"); }catch(e){ return null; } }
+function priorRaterId(roundId){ try{ return localStorage.getItem("l360_rater_"+roundId); }catch(e){ return null; } }
+
 /* ------------------------------------------------------------------- view */
 const app = document.getElementById("app");
 const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -792,14 +860,17 @@ let state = {};
 
 function render(){
   const fn = {
-    landing:vLanding, setup:vSetup, quiz:vQuiz, submitting:vSubmitting,
-    "submit-error":vSubmitError, done:vDone, dashboard:vDashboard, report:vReport
+    landing:vLanding, recover:vRecover, setup:vSetup, "need-name":vNeedName,
+    "need-leader-link":vNeedLeaderLink, resume:vResume, "already-done":vAlreadyDone,
+    quiz:vQuiz, review:vReview, submitting:vSubmitting, "submit-error":vSubmitError,
+    done:vDone, dashboard:vDashboard, report:vReport
   }[state.screen];
   app.innerHTML = fn();
   bind();
+  state._lastRenderAt = Date.now();
 }
-function fail(msg){
-  const e=document.getElementById("err");
+function fail(msg, elId){
+  const e=document.getElementById(elId||"err");
   if(e) e.innerHTML=`<div class="err">${msg}</div>`;
 }
 function fmtDate(iso){
@@ -810,15 +881,39 @@ function shuffle(a){
   for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
   return a;
 }
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /* landing */
 function vLanding(){
+  const saved = recalledLeader();
   return `
   <p class="scenario">Thirty-six situations. No right answers, no scores on screen — just what this leader would most typically do.</p>
   <p class="muted">About twenty minutes.</p>
   <div class="spacer"></div>
   <button class="btn-block btn-primary" data-start-self>Assess myself
-    <span class="faint" style="display:block;font-weight:400;font-family:var(--font-body);margin-top:4px;color:inherit;opacity:.8">Starts a new round you can invite raters to.</span></button>`;
+    <span class="faint" style="display:block;font-weight:400;font-family:var(--font-body);margin-top:4px;color:inherit;opacity:.8">Starts a new round you can invite raters to.</span></button>
+  ${ saved ? `
+    <div style="height:12px"></div>
+    <a class="btn btn-block" href="?leader=${saved}">View my assessments</a>
+  ` : "" }
+  <div class="spacer"></div>
+  <button class="link" data-go-recover>Lost your link?</button>`;
+}
+
+/* recover */
+function vRecover(){
+  return `
+  <h2>Find your assessments</h2>
+  <p class="muted">If you saved a recovery email, enter it here.</p>
+  <div class="spacer"></div>
+  <input type="text" id="recFind" maxlength="254" placeholder="you@example.com">
+  <div id="err"></div>
+  <div class="btn-row">
+    <button class="btn-primary" data-do-recover>Find my link</button>
+    <a class="link" href="${location.pathname}">Back</a>
+  </div>
+  ${ state.recoverResult===false ? `<p class="muted">No match for that email. If you still have your original link, use that instead — this tool doesn't have accounts or passwords to reset.</p>` : "" }
+  ${ state.recoverResult ? `<div class="spacer"></div><a class="btn btn-primary" href="?leader=${state.recoverResult}">Continue to your assessments</a>` : "" }`;
 }
 
 /* setup */
@@ -837,21 +932,66 @@ function vSetup(){
     <input type="text" id="nm" maxlength="6" value="${esc(state.initials||"")}" placeholder="e.g. JZ">
   ` : `
     <p class="muted">Giving feedback on <b>${esc(state.urlCtx.forName||"this leader")}</b>.</p>
+    <p class="faint">36 short scenarios, about 20 minutes. This builds their leadership 360 report — your answers are recorded, nothing is sent anywhere else, and you can choose to stay anonymous below.</p>
     <div class="spacer"></div>
     <label>Your relationship to them</label>
-    ${["M","P","D","O"].map(r=>`<button class="opt role ${state.role===r?"sel":""}" data-role="${r}">${
-      r==="M"?"I am their manager": r==="P"?"We are peers": r==="D"?"They lead me":"Something else"}</button>`).join("")}
+    ${["M","P","D","O","X"].map(r=>`<button class="opt role ${state.role===r?"sel":""}" data-role="${r}">${ROLE_LABELS[r]}</button>`).join("")}
     <div class="spacer"></div>
     <label for="nm">Your initials <span class="faint">(optional — leave blank to stay anonymous)</span></label>
     <input type="text" id="nm" maxlength="6" value="${esc(state.initials||"")}" placeholder="Optional">
   `}
   <div id="err"></div>
   ${ !self && state.roundCheck==="notfound" ? `<div class="err">This link doesn't look right — double check it with whoever sent it.</div>` : "" }
+  ${ !self && state.roundCheck==="network_error" ? `<div class="err">Couldn't reach the server just now. <button class="link" data-retry-check style="display:inline;padding:0">Try again</button></div>` : "" }
   ${ !self && state.roundCheck==="pending" ? `<p class="faint">Checking link…</p>` : "" }
   <div class="btn-row">
     <button class="btn-primary" data-start ${!self && state.roundCheck!=="ok" ? "disabled":""}>Start</button>
     ${ backHref ? `<a class="link" href="${backHref}">Back</a>` : "" }
   </div>`;
+}
+
+/* mangled rater link (round present, name lost in transit) */
+function vNeedName(){
+  return `
+  <h2>Whose leadership is this feedback for?</h2>
+  <p class="muted">This link is missing a name — probably mangled by however it was shared (chat apps sometimes break links at the "&amp;"). Enter it to continue; the rest of the link is fine.</p>
+  <div class="spacer"></div>
+  <input type="text" id="fixName" maxlength="24" placeholder="Their first name">
+  <div id="err"></div>
+  <div class="btn-row"><button class="btn-primary" data-fix-name>Continue</button></div>`;
+}
+
+/* revise requested without the leader's own link */
+function vNeedLeaderLink(){
+  return `
+  <h2>Open this from your dashboard</h2>
+  <p class="muted">Revising a self-assessment needs your personal leader link, which this URL doesn't have. Use the link you saved when you first completed the assessment, or recover it below.</p>
+  <div class="spacer"></div>
+  <div class="btn-row">
+    <button class="link" data-go-recover>Lost your link?</button>
+    <a class="link" href="${location.pathname}">Start over</a>
+  </div>`;
+}
+
+/* resume a draft */
+function vResume(){
+  const d = state.pendingDraft;
+  const answered = d.ans.filter(x=>x!==null).length;
+  return `
+  <h2>Pick up where you left off?</h2>
+  <p class="muted">${answered} of ${ITEMS.length} answered from an earlier visit.</p>
+  <div class="btn-row">
+    <button class="btn-primary" data-resume>Continue — question ${Math.min(answered+1,ITEMS.length)}</button>
+    <button class="link" data-start-over>Start over</button>
+  </div>`;
+}
+
+/* a rater's own device already submitted for this round */
+function vAlreadyDone(){
+  return `
+  <h2>You've already given feedback here</h2>
+  <p class="muted">This device already submitted a response for this round. Continuing will let you update those answers rather than add a new response.</p>
+  <div class="btn-row"><button class="btn-primary" data-update-answers>Update my answers</button></div>`;
 }
 
 /* quiz */
@@ -870,13 +1010,40 @@ function vQuiz(){
   ${ i>0 ? `<button class="link" data-back>Back</button>` : "" }`;
 }
 
+/* review before final submit */
+function vReview(){
+  return `
+  <h2>Review your answers</h2>
+  <p class="muted">Tap Change on anything before submitting — nothing is sent until you tap Submit below.</p>
+  <div class="spacer"></div>
+  ${ITEMS.map((it,i)=>{
+    const stem = state.mode==="self" ? it.self : it.other.replace(/\{N\}/g, esc(state.urlCtx.forName));
+    const chosen = it.opts[state.ans[i]].t;
+    return `<div class="reviewrow">
+      <div style="flex:1">
+        <div class="q faint">${i+1}. ${esc(stem.length>90?stem.slice(0,90)+"…":stem)}</div>
+        <div class="a">${esc(chosen)}</div>
+      </div>
+      <button class="link" data-review-edit="${i}" style="flex:0 0 auto">Change</button>
+    </div>`;
+  }).join("")}
+  <div class="spacer"></div>
+  <button class="btn-primary btn-block" data-submit-final>Submit</button>`;
+}
+
 /* submitting / error */
 function vSubmitting(){ return `<p class="scenario">Submitting…</p>`; }
 function vSubmitError(){
+  const terminal = state.submitErrorKind==="terminal";
   return `
-  <h2>Something went wrong</h2>
-  <p class="muted">Your answers are still here — that looked like a connection hiccup, not a lost response.</p>
-  <div class="btn-row"><button class="btn-primary" data-retry-submit>Try again</button></div>`;
+  <h2>${terminal ? "This didn't go through" : "Something went wrong"}</h2>
+  <p class="muted">${terminal
+    ? "The server rejected this submission — your answers are still saved on this device, but resubmitting the same way won't work. This usually means the round no longer exists or a link is out of date."
+    : "Your answers are still here — that looked like a connection hiccup, not a lost response."}</p>
+  <div class="btn-row">
+    ${ terminal ? "" : `<button class="btn-primary" data-retry-submit>Try again</button>` }
+    <a class="link" href="${location.pathname}">Back to start</a>
+  </div>`;
 }
 
 /* done */
@@ -884,20 +1051,19 @@ function vDone(){
   if(state.mode==="rate"){
     return `
     <h2>Done — thank you</h2>
-    <p class="muted">Your feedback has been recorded. Nothing more to send.</p>
-    <div class="spacer"></div>
-    <a class="btn" href="?round=${state.urlCtx.roundId}&report=1">View the live report</a>`;
+    <p class="muted">Your feedback has been recorded. Nothing more to send.</p>`;
   }
   if(state.selfKind==="revise"){
     return `
     <h2>Updated</h2>
     <p class="muted">Your self-assessment has been revised for this round.</p>
     <div class="spacer"></div>
-    <a class="btn btn-primary" href="?round=${state.urlCtx.roundId}&report=1">View the report</a>`;
+    <a class="btn btn-primary" href="?round=${state.urlCtx.roundId}&leader=${state.urlCtx.leaderId}&report=1">View the report</a>`;
   }
   const origin = location.origin + location.pathname;
   const leaderUrl = origin + "?leader=" + state.urlCtx.leaderId;
   const inviteUrl = origin + "?round=" + state.urlCtx.roundId + "&for=" + encodeURIComponent(state.name);
+  const reportUrl = "?round=" + state.urlCtx.roundId + "&leader=" + state.urlCtx.leaderId + "&report=1";
   const inviteBody = `I'm doing a leadership 360 as part of Developing the Leader Within You 2.0, and I'd value your honest read of how I actually lead. It's thirty-six short scenarios, about twenty minutes.\n\n${inviteUrl}`;
   return `
   <h2>Done — thank you</h2>
@@ -919,7 +1085,7 @@ function vDone(){
   <p class="faint" style="margin-top:20px">Four to six raters gives you a usable picture. Aim for a mix: your manager, two or three peers, and at least two people you lead.</p>
 
   <div class="spacer"></div>
-  <div class="btn-row"><a class="btn btn-primary" href="?round=${state.urlCtx.roundId}&report=1">View live report</a></div>`;
+  <div class="btn-row"><a class="btn btn-primary" href="${reportUrl}">View live report</a></div>`;
 }
 
 /* dashboard */
@@ -930,6 +1096,8 @@ function vDashboard(){
     <p class="muted">This link doesn't match anything on file.</p>
     <a class="btn btn-primary" href="${location.pathname}">Start a self-assessment</a>`;
   const d = state.dash.data;
+  const origin = location.origin + location.pathname;
+  const inviteUrl = d.rounds.length ? origin + "?round=" + d.rounds[0].roundId + "&for=" + encodeURIComponent(d.name||"") : null;
   return `
   <h2>${d.name?esc(d.name)+"'s":"Your"} assessments</h2>
   <p class="muted">Meant to be retaken every few months — this is where you'll always find your history.</p>
@@ -942,11 +1110,35 @@ function vDashboard(){
           ${i===0?`<div class="meta">Most recent</div>`:""}
         </div>
         <div class="btn-row" style="margin-top:0">
-          <a class="btn" href="?round=${r.roundId}&report=1">View report</a>
-          ${i===0?`<a class="btn" href="?round=${r.roundId}&revise=1">Revise</a>`:""}
+          <a class="btn" href="?round=${r.roundId}&leader=${d.leaderId}&report=1">View report</a>
+          ${i===0?`<a class="btn" href="?round=${r.roundId}&leader=${d.leaderId}&revise=1">Revise</a>`:""}
         </div>
       </div>`).join("")}
   </div>
+
+  ${ inviteUrl ? `
+  <div class="spacer"></div>
+  <div class="card">
+    <h3>Invite more raters</h3>
+    <div style="height:10px"></div>
+    <p class="muted">Sends whoever opens it straight to the most recent round.</p>
+    <div class="code">${esc(inviteUrl)}</div>
+    <div class="btn-row" style="margin-top:0">
+      <button data-copy="${esc(inviteUrl)}">Copy invite link</button>
+      <a class="btn" href="mailto:?subject=${encodeURIComponent("Quick favor — leadership feedback")}&body=${encodeURIComponent("I'm doing a leadership 360 as part of Developing the Leader Within You 2.0, and I'd value your honest read of how I actually lead. It's thirty-six short scenarios, about twenty minutes.\n\n"+inviteUrl)}">Send by email</a>
+    </div>
+  </div>` : "" }
+
+  <div class="spacer"></div>
+  <div class="card">
+    <h3>${d.email ? "Recovery email on file" : "Save a recovery email"}</h3>
+    <div style="height:10px"></div>
+    <p class="muted">${d.email ? `We'll use <b>${esc(d.email)}</b> if you ever need to find this dashboard again.` : "Optional — purely so you can find your way back if you lose this link. Raters are never asked for this."}</p>
+    <input type="text" id="recEmail" maxlength="254" value="${esc(d.email||"")}" placeholder="you@example.com">
+    <div id="emailErr"></div>
+    <div class="btn-row"><button data-save-email>${d.email?"Update":"Save"}</button></div>
+  </div>
+
   <div class="spacer"></div>
   <a class="btn btn-primary btn-block" href="?leader=${d.leaderId}&newround=1">Start a new round</a>`;
 }
@@ -970,20 +1162,19 @@ function reportHTML(d){
   const staleRaters = d.raters.filter(r=>!compatible(r)).length;
   const self = compatible(d.self) ? d.self : null;
   const raters = d.raters.filter(compatible);
+  const isLeader = !!state.urlCtx.leaderId;
+  const backLink = isLeader ? `<a class="link" href="?leader=${state.urlCtx.leaderId}">&larr; Your assessments</a>` : "";
 
-  if(staleSelf || staleRaters){
-    const nothingLeft = !self && raters.length===0;
-    if(nothingLeft) return `
-      <div class="btn-row" style="margin-bottom:8px">
-        <a class="link" href="?leader=${d.leaderId}">&larr; Your assessments</a>
-      </div>
+  if((staleSelf || staleRaters) && !self && raters.length===0){
+    return `
+      <div class="btn-row" style="margin-bottom:8px">${backLink}</div>
       <div class="headline">
         <div class="eyebrow">Earlier version</div>
         <div class="lvl">This round can't be scored</div>
         <p class="muted">It was answered on an earlier, shorter version of the assessment, so its answers don't line up with the current questions. The responses are still stored, but they can't be compared against the current scoring.</p>
-        <p class="muted">Start a new round to get a report on the current version.</p>
+        ${ isLeader ? `<p class="muted">Start a new round to get a report on the current version.</p>` : "" }
       </div>
-      <a class="btn btn-primary" href="?leader=${d.leaderId}&newround=1">Start a new round</a>`;
+      ${ isLeader ? `<a class="btn btn-primary" href="?leader=${state.urlCtx.leaderId}&newround=1">Start a new round</a>` : "" }`;
   }
 
   const selfLevels = self ? levelScores(self.ans) : null;
@@ -1024,26 +1215,57 @@ function reportHTML(d){
     <span class="t"><i style="width:${Math.max(2,(v-1)/4*100)}%"></i></span>
     <span class="v">${v.toFixed(1)}</span></div>`;
 
+  // Per-response pyramid views. Stable shuffle so display order never
+  // matches (and therefore can't reveal) submission order.
+  if(!state.report.viewOrder) state.report.viewOrder = seededShuffle(raters.map((_,i)=>i), hashStr(d.roundId));
+  const viewOrder = state.report.viewOrder;
+  const view = state.report.view || "all";
+
+  let vLevels=null, vConsolidated=0, vAvg=0, vEyebrow="", vEmpty=false;
+  if(view==="self"){
+    vEyebrow = "How you see yourself";
+    if(selfLevels){ vLevels=selfLevels; vConsolidated=consolidatedLevel(selfLevels); vAvg=mean(LEVEL_KEYS.map(L=>selfLevels[L])); }
+    else vEmpty=true;
+  } else if(view.startsWith("r")){
+    vEyebrow = "One rater's read of you";
+    const idx = Number(view.slice(1));
+    vLevels = rLevelScores[idx]; vConsolidated = consolidatedLevel(vLevels); vAvg = mean(LEVEL_KEYS.map(L=>vLevels[L]));
+  } else {
+    vEyebrow = "What the people around you say";
+    if(raters.length){ vLevels=othersLevels; vConsolidated=consolidated; vAvg=overviewAvg; }
+    else vEmpty=true;
+  }
+
+  const viewTabs = () => {
+    const opts=[{key:"all",label:"Everyone"}];
+    if(self) opts.push({key:"self",label:"You"});
+    viewOrder.forEach((idx,pos)=>opts.push({key:"r"+idx,label:"Response "+(pos+1)}));
+    if(opts.length<2) return "";
+    return `<div>${opts.map(o=>`<button class="opt small ${view===o.key?'sel':''}" data-report-view="${o.key}">${o.label}</button>`).join("")}</div>`;
+  };
+
   return `
   <div class="btn-row" style="margin-bottom:8px">
-    <a class="link" href="?leader=${d.leaderId}">&larr; Your assessments</a>
+    ${backLink}
     <button class="link" data-refresh-report>Refresh</button>
   </div>
 
   ${ (staleSelf || staleRaters) ? `<div class="err">Left out of this report: ${[
         staleSelf ? "your own self-assessment" : null,
         staleRaters ? `${staleRaters} rater response${staleRaters>1?"s":""}` : null
-      ].filter(Boolean).join(" and ")} — answered on an earlier, shorter version of the assessment, so they can't be scored against the current questions. Start a new round for a clean comparison.</div>` : "" }
+      ].filter(Boolean).join(" and ")} — answered on an earlier, shorter version of the assessment, so they can't be scored against the current questions.${isLeader?" Start a new round for a clean comparison.":""}</div>` : "" }
 
   <div class="headline">
-    <div class="eyebrow">What the people around you say</div>
-    ${ raters.length===0 ? `
-      <div class="lvl">Waiting on feedback</div>
-      <p class="muted">No one has submitted feedback for this round yet. Share the invite link from your assessments page.</p>
+    <div class="eyebrow">${vEyebrow}</div>
+    ${viewTabs()}
+    <div class="spacer" style="height:14px"></div>
+    ${ vEmpty ? `
+      <div class="lvl">${view==="self" ? "No self-assessment on file" : "Waiting on feedback"}</div>
+      <p class="muted">${view==="self" ? "This round doesn't have a self-assessment recorded." : "No one has submitted feedback for this round yet. Share the invite link from your assessments page."}</p>
     ` : `
-      <div class="avgnum">${overviewAvg.toFixed(1)}<span style="font-size:0.35em;font-weight:600;color:var(--fg-muted)"> / 5</span></div>
-      ${ladder(consolidated)}
-      <p class="muted">${floorSentence(othersLevels)}</p>
+      <div class="avgnum">${vAvg.toFixed(1)}<span style="font-size:0.35em;font-weight:600;color:var(--fg-muted)"> / 5</span></div>
+      ${pyramid(vLevels, vConsolidated)}
+      <p class="muted">${floorSentence(vLevels)}</p>
     `}
     <div style="margin-top:14px">
       ${self?`<span class="pill">Self · 1</span>`:""}
@@ -1054,7 +1276,7 @@ function reportHTML(d){
 
   ${ raters.length===0 ? "" : `
   <h2>Nine traits</h2>
-  <p class="muted">Grounded in the book's own chapters. Their read is the orange bar.</p>
+  <p class="muted">Grounded in the book's own chapters — the aggregate across all raters. Their read is the orange bar.</p>
   ${TRAIT_KEYS.map(k=>`
     <div class="traitrow">
       <div class="nm">${TRAITS[k].name}</div>
@@ -1098,17 +1320,38 @@ function reportHTML(d){
     <div><div>${esc(ACTIONS[c].t)}</div><div class="ref">${esc(ACTIONS[c].ref)}</div></div></div>`).join("")}
   `}
 
+  ${ isLeader ? `
   <div class="spacer"></div>
-  <div class="btn-row"><a class="btn" href="?round=${d.roundId}&revise=1">Revise my self-assessment</a></div>`;
+  <div class="btn-row"><a class="btn" href="?round=${d.roundId}&leader=${state.urlCtx.leaderId}&revise=1">Revise my self-assessment</a></div>` : "" }`;
 }
 
 /* ------------------------------------------------------------------ binds */
 function bind(){
   const startSelf = app.querySelector("[data-start-self]");
-  if(startSelf) startSelf.onclick=()=>{
-    state.screen="setup"; state.mode="self"; state.selfKind="new";
-    state.name=state.name||""; state.initials=state.initials||"";
+  if(startSelf) startSelf.onclick=()=>beginQuizFlow("self","new");
+
+  const goRecover = app.querySelectorAll("[data-go-recover]");
+  goRecover.forEach(b=>b.onclick=()=>{ state.screen="recover"; state.recoverResult=undefined; render(); });
+
+  const doRecover = app.querySelector("[data-do-recover]");
+  if(doRecover) doRecover.onclick=async ()=>{
+    const v=(document.getElementById('recFind').value||"").trim();
+    if(!EMAIL_RE.test(v)) return fail("Enter a valid email.");
+    doRecover.textContent="Looking…"; doRecover.disabled=true;
+    const r = await api("POST","/recover",{email:v});
+    doRecover.textContent="Find my link"; doRecover.disabled=false;
+    state.recoverResult = (r.ok && r.data.found) ? r.data.leaderId : false;
     render();
+  };
+
+  const fixName = app.querySelector("[data-fix-name]");
+  if(fixName) fixName.onclick=()=>{
+    const v=(document.getElementById('fixName').value||"").replace(/[^A-Za-z0-9 '.-]/g,"").slice(0,24).trim();
+    if(!v) return fail("Please enter a name.");
+    state.urlCtx.forName=v;
+    state.screen="setup"; state.mode="rate"; state.roundCheck="pending"; state.role=null; state.initials="";
+    render();
+    checkRoundExists();
   };
 
   app.querySelectorAll("[data-role]").forEach(b=>b.onclick=()=>{
@@ -1130,17 +1373,49 @@ function bind(){
     }
     state.q=0; state.ans=new Array(ITEMS.length).fill(null);
     state.order=ITEMS.map(it=>shuffle(it.opts.map((_,i)=>i)));
-    state.screen="quiz"; render(); window.scrollTo(0,0);
+    enterQuiz();
   };
 
+  const retryCheck = app.querySelector("[data-retry-check]");
+  if(retryCheck) retryCheck.onclick=()=>{ state.roundCheck="pending"; render(); checkRoundExists(); };
+
+  const resumeBtn = app.querySelector("[data-resume]");
+  if(resumeBtn) resumeBtn.onclick=()=>{
+    const d = state.pendingDraft;
+    state.ans=d.ans; state.order=d.order; state.q=Math.min(d.q, ITEMS.length-1);
+    state.role=d.role||state.role; state.initials=d.initials||""; state.name=d.name||state.name;
+    enterQuiz(true);
+  };
+  const startOver = app.querySelector("[data-start-over]");
+  if(startOver) startOver.onclick=()=>{ clearDraft(state.pendingDraftKey); goToSetup(); };
+
+  const updateAnswers = app.querySelector("[data-update-answers]");
+  if(updateAnswers) updateAnswers.onclick=()=>goToSetup();
+
   app.querySelectorAll("[data-opt]").forEach(b=>b.onclick=()=>{
+    if(Date.now() - (state._lastRenderAt||0) < TAP_DEBOUNCE_MS) return;
     state.ans[state.q]=Number(b.dataset.opt);
-    if(state.q < ITEMS.length-1){ state.q++; state.screen="quiz"; render(); window.scrollTo(0,0); }
-    else submitCurrentAndFinish();
+    saveDraft();
+    if(state.reviewMode){ state.reviewMode=false; state.screen="review"; render(); window.scrollTo(0,0); return; }
+    if(state.q < ITEMS.length-1){
+      state.q++;
+      history.pushState({l360:"quiz", q:state.q}, "", location.href);
+      state.screen="quiz"; render(); window.scrollTo(0,0);
+    } else {
+      state.screen="review"; render(); window.scrollTo(0,0);
+    }
   });
 
   const back = app.querySelector("[data-back]");
-  if(back) back.onclick=()=>{ state.q--; render(); window.scrollTo(0,0); };
+  if(back) back.onclick=()=>history.back();
+
+  app.querySelectorAll("[data-review-edit]").forEach(b=>b.onclick=()=>{
+    state.q=Number(b.dataset.reviewEdit); state.reviewMode=true;
+    history.pushState({l360:"quiz", q:state.q}, "", location.href);
+    state.screen="quiz"; render(); window.scrollTo(0,0);
+  });
+  const submitFinal = app.querySelector("[data-submit-final]");
+  if(submitFinal) submitFinal.onclick=()=>submitCurrentAndFinish();
 
   app.querySelectorAll("[data-copy]").forEach(b=>b.onclick=()=>copy(b.dataset.copy, b, b.textContent.trim()));
 
@@ -1149,31 +1424,89 @@ function bind(){
 
   const refresh = app.querySelector("[data-refresh-report]");
   if(refresh) refresh.onclick=()=>{ state.report={phase:"loading"}; render(); loadReport(); };
+
+  app.querySelectorAll("[data-report-view]").forEach(b=>b.onclick=()=>{
+    state.report.view = b.dataset.reportView; render();
+  });
+
+  const saveEmail = app.querySelector("[data-save-email]");
+  if(saveEmail) saveEmail.onclick=async ()=>{
+    const v=(document.getElementById('recEmail').value||"").trim();
+    if(!EMAIL_RE.test(v)) return fail("That doesn't look like a valid email.","emailErr");
+    saveEmail.textContent="Saving…"; saveEmail.disabled=true;
+    const r = await api("POST", `/leader/${state.urlCtx.leaderId}/email`, {email:v});
+    if(r.ok){ state.dash.data.email=v; render(); }
+    else { saveEmail.textContent="Couldn't save — try again"; saveEmail.disabled=false; }
+  };
 }
 
 /* --------------------------------------------------------------- actions */
+// Entry point for starting (or resuming) any quiz-answering flow: checks for
+// a saved draft first so a returning rater/leader is offered resume rather
+// than silently starting over (and, for raters, creating an unintended
+// duplicate response).
+function beginQuizFlow(mode, selfKind){
+  state.mode = mode;
+  if(mode==="self") state.selfKind = selfKind;
+  state.name = state.name || ""; state.initials = state.initials || "";
+  const key = draftKeyFor(mode, selfKind, state.urlCtx.roundId);
+  const draft = loadDraft(key);
+  if(draft){
+    state.screen="resume"; state.pendingDraft=draft; state.pendingDraftKey=key;
+    render();
+    return;
+  }
+  goToSetup();
+}
+function goToSetup(){ state.screen="setup"; render(); }
+function enterQuiz(isResume){
+  state.reviewMode=false;
+  history.pushState({l360:"quiz", q:state.q}, "", location.href);
+  state.screen="quiz"; render(); window.scrollTo(0,0);
+}
+
+window.addEventListener("popstate", (e)=>{
+  // Handles the phone back-gesture from both mid-quiz and the review screen
+  // (finishing Q36 goes straight to review without pushing a new history
+  // entry, so a back-tap from review must still resolve to the last pushed
+  // quiz entry, not be silently ignored because state.screen is "review").
+  if(e.state && e.state.l360==="quiz"){
+    state.q = e.state.q; state.reviewMode=false; state.screen="quiz"; render();
+  } else if(state.screen==="quiz" || state.screen==="review"){
+    // Backed out of the quiz entirely (no more quiz history entries) — the
+    // draft is untouched, so reopening this same link resumes normally.
+    state.screen="setup"; render();
+  }
+});
+
 async function submitCurrentAndFinish(){
   state.screen="submitting"; render();
   let result;
+  const draftKey = draftKeyFor(state.mode, state.selfKind, state.urlCtx.roundId);
   if(state.mode==="self"){
     if(state.selfKind==="revise"){
       result = await api("POST", `/round/${state.urlCtx.roundId}/response`,
-        {kind:"self", initials:state.initials, ans:state.ans});
+        {kind:"self", leaderId:state.urlCtx.leaderId, initials:state.initials, ans:state.ans});
     } else {
       result = await api("POST", "/round",
         {leaderId: state.urlCtx.leaderId||undefined, name: state.name, initials: state.initials, ans: state.ans});
     }
   } else {
-    let raterId;
-    try{ raterId = localStorage.getItem("l360_rater_"+state.urlCtx.roundId) || undefined; }catch(e){}
     result = await api("POST", `/round/${state.urlCtx.roundId}/response`,
-      {kind:"rater", role:state.role, initials:state.initials, ans:state.ans, raterId});
+      {kind:"rater", role:state.role, initials:state.initials, ans:state.ans, raterId: priorRaterId(state.urlCtx.roundId)||undefined});
   }
-  if(!result.ok){ state.screen="submit-error"; state._retry=submitCurrentAndFinish; render(); return; }
+  if(!result.ok){
+    state.screen="submit-error";
+    state.submitErrorKind = (result.status>=400 && result.status<500) ? "terminal" : "retryable";
+    state._retry=submitCurrentAndFinish;
+    render(); return;
+  }
+  clearDraft(draftKey);
   if(state.mode==="self" && state.selfKind!=="revise"){
     state.urlCtx.leaderId = result.data.leaderId;
     state.urlCtx.roundId = result.data.roundId;
     history.replaceState(null,"","?leader="+state.urlCtx.leaderId);
+    rememberLeader(state.urlCtx.leaderId);
   }
   if(state.mode==="rate" && result.data.raterId){
     try{ localStorage.setItem("l360_rater_"+state.urlCtx.roundId, result.data.raterId); }catch(e){}
@@ -1184,7 +1517,15 @@ async function submitCurrentAndFinish(){
 
 async function checkRoundExists(){
   const r = await api("GET", "/round/"+state.urlCtx.roundId);
-  state.roundCheck = r.ok ? "ok" : "notfound";
+  if(!r.ok){
+    state.roundCheck = (r.status===404) ? "notfound" : "network_error";
+    render(); return;
+  }
+  state.roundCheck = "ok";
+  if(priorRaterId(state.urlCtx.roundId)){ state.screen="already-done"; render(); return; }
+  const key = draftKeyFor("rate", null, state.urlCtx.roundId);
+  const draft = loadDraft(key);
+  if(draft){ state.screen="resume"; state.pendingDraft=draft; state.pendingDraftKey=key; }
   render();
 }
 async function loadReport(){
@@ -1194,15 +1535,13 @@ async function loadReport(){
 }
 async function prefillRevise(){
   const r = await api("GET", "/round/"+state.urlCtx.roundId);
-  if(r.ok){
-    state.urlCtx.leaderId = r.data.leaderId;
-    if(r.data.self) state.initials = r.data.self.initials;
-  }
+  if(r.ok && r.data.self) state.initials = r.data.self.initials;
   render();
 }
 async function loadDashboard(){
   const r = await api("GET", "/leader/"+state.urlCtx.leaderId);
   state.dash = r.ok ? {phase:"ready", data:r.data} : {phase:"error"};
+  if(r.ok) rememberLeader(state.urlCtx.leaderId);
   render();
 }
 async function prefillNewRoundName(){
@@ -1229,8 +1568,17 @@ function boot(){
     render(); loadReport(); return;
   }
   if(urlCtx.roundId && p.get("revise")==="1"){
+    if(!urlCtx.leaderId){ state = {screen:"need-leader-link", urlCtx}; render(); return; }
     state = {screen:"setup", mode:"self", selfKind:"revise", urlCtx, name:"", initials:""};
     render(); prefillRevise(); return;
+  }
+  if(urlCtx.roundId && !p.get("report") && !p.get("revise")){
+    // round present, but neither a rater's `for=` nor a leader action param —
+    // most likely a rater link mangled in transit (chat apps often break
+    // autolinking at `&`). Ask for the name instead of falling through to a
+    // context-free landing page that would start an unrelated new round.
+    state = {screen:"need-name", urlCtx};
+    render(); return;
   }
   if(urlCtx.leaderId && p.get("newround")==="1"){
     state = {screen:"setup", mode:"self", selfKind:"new", urlCtx, name:"", initials:""};
