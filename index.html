@@ -977,11 +977,12 @@ function vNeedLeaderLink(){
 function vResume(){
   const d = state.pendingDraft;
   const answered = d.ans.filter(x=>x!==null).length;
+  const allDone = answered===ITEMS.length;
   return `
   <h2>Pick up where you left off?</h2>
   <p class="muted">${answered} of ${ITEMS.length} answered from an earlier visit.</p>
   <div class="btn-row">
-    <button class="btn-primary" data-resume>Continue — question ${Math.min(answered+1,ITEMS.length)}</button>
+    <button class="btn-primary" data-resume>${allDone ? "Continue to review" : `Continue — question ${answered+1}`}</button>
     <button class="link" data-start-over>Start over</button>
   </div>`;
 }
@@ -1384,7 +1385,12 @@ function bind(){
     const d = state.pendingDraft;
     state.ans=d.ans; state.order=d.order; state.q=Math.min(d.q, ITEMS.length-1);
     state.role=d.role||state.role; state.initials=d.initials||""; state.name=d.name||state.name;
-    enterQuiz(true);
+    if(d.ans.every(x=>x!==null)){
+      history.pushState({l360:"quiz", q:ITEMS.length-1}, "", location.href);
+      state.screen="review"; render(); window.scrollTo(0,0);
+    } else {
+      enterQuiz(true);
+    }
   };
   const startOver = app.querySelector("[data-start-over]");
   if(startOver) startOver.onclick=()=>{ clearDraft(state.pendingDraftKey); goToSetup(); };
@@ -1395,13 +1401,21 @@ function bind(){
   app.querySelectorAll("[data-opt]").forEach(b=>b.onclick=()=>{
     if(Date.now() - (state._lastRenderAt||0) < TAP_DEBOUNCE_MS) return;
     state.ans[state.q]=Number(b.dataset.opt);
-    saveDraft();
-    if(state.reviewMode){ state.reviewMode=false; state.screen="review"; render(); window.scrollTo(0,0); return; }
+    if(state.reviewMode){
+      saveDraft(); // q left at the edited index — fine, ans is fully populated
+      state.reviewMode=false; state.screen="review"; render(); window.scrollTo(0,0); return;
+    }
     if(state.q < ITEMS.length-1){
       state.q++;
+      // Saved AFTER advancing so a resumed draft's q is the next unanswered
+      // question, matching what "Continue — question N" on the resume
+      // screen promises (saving before the increment would resume back
+      // onto the question just answered instead of the next one).
+      saveDraft();
       history.pushState({l360:"quiz", q:state.q}, "", location.href);
       state.screen="quiz"; render(); window.scrollTo(0,0);
     } else {
+      saveDraft(); // all 36 answered — draft's q stays at the last index
       state.screen="review"; render(); window.scrollTo(0,0);
     }
   });
