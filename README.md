@@ -9,10 +9,10 @@ or email around.
 
 ## How it works
 
-- **Leader** clicks "Assess myself," answers 15 scenarios, gets two links:
+- **Leader** clicks "Assess myself," answers 36 scenarios, gets two links:
   a durable link to their own dashboard (`?leader=<id>`) and an invite link
   for raters (`?round=<id>&for=<name>`).
-- **Raters** open the invite link, answer the same 15 scenarios about the
+- **Raters** open the invite link, answer the same 36 scenarios about the
   leader, and submit — nothing to send back manually.
 - **Report** (`?round=<id>&report=1`) shows a live, self-updating picture:
   one overview score across Maxwell's Five Levels, then a breakdown across
@@ -64,7 +64,7 @@ and leaves everything else untouched):
 ./backend/setup-aws.sh
 ```
 
-**Item bank** — the 15 scenarios live in the `ITEMS` array near the top of
+**Item bank** — the 36 scenarios live in the `ITEMS` array near the top of
 `index.html`'s `<script>` block. Each item:
 
 ```js
@@ -92,6 +92,15 @@ Rules that matter when editing:
 - `ch` can list more than one chapter (used for `tw` splits and "next
   moves"); it's forgiving to get approximately right.
 
+**Changing the number of items is a breaking change.** Responses are stored
+as a bare answer array, so they can only be scored against the bank they were
+answered on. If you add or remove scenarios you must also update `ITEM_COUNT`
+in `backend/index.mjs` and redeploy. Rounds recorded on the previous bank stay
+in the database but are excluded from reports, with a notice explaining why —
+they aren't silently mis-scored. Reordering or reweighting existing items is
+safe; adding, removing, or rewording the *options* within an item is not, since
+answers are stored as option indices.
+
 ## Pilot protocol
 
 1. Pick one leader to pilot with — someone genuinely curious about the gap
@@ -112,7 +121,7 @@ Rules that matter when editing:
 - No protection against a leader fabricating rater responses directly via
   the API — this is a trust instrument for a coaching relationship, not a
   locked-down survey tool.
-- Fixed at 15 items / 5 levels / 9 traits / 5 options per scenario.
+- Fixed at 36 items / 5 levels / 9 traits / 5 options per scenario.
 - DynamoDB is provisioned at 1 RCU/1 WCU on purpose (to guarantee free
   tier); a burst of many raters submitting in the same second could see a
   retried request rather than an instant one — not a failure, just a beat

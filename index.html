@@ -163,19 +163,20 @@ textarea{min-height:150px;font-family:ui-monospace,Menlo,Consolas,monospace;font
 const API_BASE = "https://1g9ewfu8dc.execute-api.us-east-1.amazonaws.com";
 
 /* ============================================================================
-   ITEM BANK — edit scenario and option wording freely.
+   ITEM BANK — 36 scenarios, four per trait.
    `s` is the maturity score (1–5) and is never shown or implied to the user.
    `w` maps the item onto the five Levels of Leadership (used only for the
-   report's one-line overview); `tw` maps it onto named traits, one per book
-   chapter — this is the report's main breakdown. `ch` lists the same
-   chapter(s) as `tw`'s keys and drives the report's "next moves" lookup.
-   Both weight objects sum to 1 per item; most items map to a single trait.
+   report's overview score and floor sentence); `tw` maps it onto named traits,
+   one per book chapter — the report's main breakdown. `ch` mirrors `tw`'s keys
+   and drives the "next moves" lookup. Both weight objects sum to 1 per item.
+   Items are interleaved so no two consecutive scenarios share a trait.
    ========================================================================== */
 const ITEMS = [
+/* -- 1 · Priorities ------------------------------------------------------ */
 {
   ch:[2], w:{1:.7,3:.3}, tw:{2:1},
-  self:"You've blocked out this morning for the one piece of work that actually moves the year forward. At 9:10 a colleague appears with something that has to be sorted today.",
-  other:"{N} has blocked out the morning for the one piece of work that actually moves the year forward. At 9:10 a colleague appears with something that has to be sorted today.",
+  self:"You blocked out this morning weeks ago for the one piece of work that genuinely moves your year forward — the kind that never happens unless it is protected. At 9:10 a colleague arrives at your desk with something that has to be sorted today.",
+  other:"{N} blocked out the morning weeks ago for the one piece of work that genuinely moves their year forward — the kind that never happens unless it is protected. At 9:10 a colleague arrives with something that has to be sorted today.",
   opts:[
     {t:"Drops the morning's work and deals with it. Someone asked, and it is genuinely urgent.",s:1},
     {t:"Handles it quickly, then tries to salvage what is left of the morning.",s:2},
@@ -184,34 +185,11 @@ const ITEMS = [
     {t:"Protects the morning. This kind of interruption has already been designed out of most weeks.",s:5}
   ]
 },
+/* -- 2 · Character ------------------------------------------------------- */
 {
-  ch:[2], w:{1:.6,3:.4}, tw:{2:1},
-  self:"A well-run organisation invites you onto a new working group. It is a real opportunity, the people are good, and it has nothing to do with your top three priorities this year.",
-  other:"A well-run organisation invites {N} onto a new working group. It is a real opportunity, the people are good, and it has nothing to do with {N}'s top three priorities this year.",
-  opts:[
-    {t:"Says yes. Opportunities like this do not come round twice.",s:1},
-    {t:"Says yes, then quietly struggles to fit it around everything else.",s:2},
-    {t:"Asks for time to think, and says yes to a smaller version of it.",s:3},
-    {t:"Declines, and says what they are saying yes to instead.",s:4},
-    {t:"Declines, and puts forward someone on the team for whom it would be a stretch worth having.",s:5}
-  ]
-},
-{
-  ch:[9], w:{1:.7,5:.3}, tw:{9:1},
-  self:"There is a standing commitment in your week that nobody would notice disappearing — the numbers review, the one-to-one with the quietest person on your team, the reading hour. A brutal week hits.",
-  other:"There is a standing commitment in {N}'s week that nobody would notice disappearing — the numbers review, the one-to-one with the quietest person on the team, the reading hour. A brutal week hits.",
-  opts:[
-    {t:"It goes. It is the obvious thing to drop when the week is full.",s:1},
-    {t:"It gets pushed, and picked up again once things settle.",s:2},
-    {t:"It gets shortened, but it still happens.",s:3},
-    {t:"It happens as normal. It is booked like anything else in the diary.",s:4},
-    {t:"It happens as normal, and the team have noticed that it always does.",s:5}
-  ]
-},
-{
-  ch:[9,3], w:{1:.4,5:.6}, tw:{3:.6,9:.4},
-  self:"You come out of a meeting with senior leadership and walk straight into a meeting with your team about the same subject.",
-  other:"{N} comes out of a meeting with senior leadership and walks straight into a meeting with the team about the same subject.",
+  ch:[3], w:{5:.6,1:.4}, tw:{3:1},
+  self:"You come out of a meeting with senior leadership where some hard decisions were made, and walk straight into a meeting with your own team about the same subject. Some of what was said upstairs will not be welcome downstairs.",
+  other:"{N} comes out of a meeting with senior leadership where some hard decisions were made, and walks straight into a meeting with their own team about the same subject. Some of what was said upstairs will not be welcome downstairs.",
   opts:[
     {t:"The two versions are quite different. Each room hears what it needs to hear.",s:1},
     {t:"The message is the same, but the tone shifts a lot depending on the room.",s:2},
@@ -220,82 +198,11 @@ const ITEMS = [
     {t:"Same message, same detail — and the uncomfortable part gets said in the room where it costs them most.",s:5}
   ]
 },
-{
-  ch:[7], w:{2:.7,4:.3}, tw:{7:1},
-  self:"Someone who joined your team six weeks ago is visibly out of their depth. They have not asked for help.",
-  other:"Someone who joined {N}'s team six weeks ago is visibly out of their depth. They have not asked for help.",
-  opts:[
-    {t:"Waits. Asking for help is part of the job, and they will get there.",s:1},
-    {t:"Tightens up the instructions and checks the work more closely.",s:2},
-    {t:"Asks how they are finding it at the next scheduled catch-up.",s:3},
-    {t:"Goes to them, names what they have noticed without judgement, and asks what would help.",s:4},
-    {t:"Already knows what they are struggling with, because they have been asking what this job is like from where that person sits.",s:5}
-  ]
-},
-{
-  ch:[7], w:{2:.8,5:.2}, tw:{7:1},
-  self:"There is one person you work with regularly whom you just do not warm to. Nothing has gone wrong. The chemistry is not there.",
-  other:"There is one person {N} works with regularly whom they just do not warm to. Nothing has gone wrong. The chemistry is not there.",
-  opts:[
-    {t:"Keeps it professional, and keeps the contact to a minimum.",s:1},
-    {t:"Is perfectly civil, and gets the work done through other people where possible.",s:2},
-    {t:"Makes an effort to be fair, and is careful not to let it show.",s:3},
-    {t:"Has gone looking for what that person is good at, and puts them in front of it.",s:4},
-    {t:"Has spent enough time understanding how things look from where that person stands that their view of them has changed.",s:5}
-  ]
-},
-{
-  ch:[6], w:{2:.7,3:.3}, tw:{6:1},
-  self:"Nothing is badly wrong, but a low-grade grumbling has settled over your team. It shows up in side conversations more than in meetings.",
-  other:"Nothing is badly wrong, but a low-grade grumbling has settled over {N}'s team. It shows up in side conversations more than in meetings.",
-  opts:[
-    {t:"Leaves it. Every team grumbles, and it passes.",s:1},
-    {t:"Tells the team to focus on the positives.",s:2},
-    {t:"Works out where it is coming from and has a quiet word with that person.",s:3},
-    {t:"Names it openly with the team and asks what is actually behind it.",s:4},
-    {t:"Is consistently the first to say out loud what is working, asks people what they would change, then changes one of them.",s:5}
-  ]
-},
-{
-  ch:[6], w:{2:.5,5:.5}, tw:{6:1},
-  self:"A decision you pushed for has clearly not worked. It is visible, and other people have paid some of the cost.",
-  other:"A decision {N} pushed for has clearly not worked. It is visible, and other people have paid some of the cost.",
-  opts:[
-    {t:"Explains the circumstances that made it the right call at the time.",s:1},
-    {t:"Accepts that it did not work, and moves the conversation on to the fix.",s:2},
-    {t:"Owns it privately with their own leader, and keeps it low-key with the team.",s:3},
-    {t:"Says plainly to the team that it was their call and it was wrong.",s:4},
-    {t:"Says it was their call, says what they got wrong, and says what they will do differently — in front of the people who paid for it.",s:5}
-  ]
-},
-{
-  ch:[5], w:{3:.7,1:.3}, tw:{5:1},
-  self:"A problem lands that sits between two teams. It is nobody's job, and it is getting worse.",
-  other:"A problem lands that sits between two teams. It is nobody's job, and it is getting worse.",
-  opts:[
-    {t:"Escalates it. Someone above needs to decide who owns this.",s:1},
-    {t:"Raises it with the other team and waits to see what they do.",s:2},
-    {t:"Takes it on, and works it out alone.",s:3},
-    {t:"Gets the right people in a room, and they leave with an owner and a first step.",s:4},
-    {t:"Flagged this one weeks ago, before it was a problem. The fix is already running.",s:5}
-  ]
-},
-{
-  ch:[5], w:{3:.6,4:.4}, tw:{5:1},
-  self:"The same problem has come back for the fourth time this year. Each time, the team patches it and moves on.",
-  other:"The same problem has come back for the fourth time this year. Each time, the team patches it and moves on.",
-  opts:[
-    {t:"Patches it again. It works, and there are bigger things to deal with.",s:1},
-    {t:"Patches it, and adds it to the list of things to look at properly one day.",s:2},
-    {t:"Sets aside time to work out the real cause themselves.",s:3},
-    {t:"Asks the team what is actually causing this, and picks from the options they come back with.",s:4},
-    {t:"Hands the whole thing to someone on the team to solve, and backs the answer they come up with.",s:5}
-  ]
-},
+/* -- 3 · Leading Change -------------------------------------------------- */
 {
   ch:[4], w:{3:.6,2:.4}, tw:{4:1},
-  self:"A change you have been planning for months is announced at the team meeting. Two of your most experienced people push back hard, and the room goes quiet.",
-  other:"A change {N} has been planning for months is announced at the team meeting. Two of the most experienced people push back hard, and the room goes quiet.",
+  self:"A change you have been planning for months is announced at the team meeting. It affects how everyone works day to day. Two of your most experienced people push back hard, in front of everyone, and the room goes quiet.",
+  other:"A change {N} has been planning for months is announced at the team meeting. It affects how everyone works day to day. Two of the most experienced people push back hard, in front of everyone, and the room goes quiet.",
   opts:[
     {t:"Restates the decision and the reasons for it, and moves the meeting on.",s:1},
     {t:"Defends the plan point by point until the objections stop.",s:2},
@@ -304,22 +211,76 @@ const ITEMS = [
     {t:"Had already met both of them before the announcement. The meeting is where they help carry it.",s:5}
   ]
 },
+/* -- 4 · Problem Solving ------------------------------------------------- */
 {
-  ch:[4], w:{3:.7,5:.3}, tw:{4:1},
-  self:"Three months into a change, the energy has gone. Results have dipped, which everyone was warned about, and people are asking whether it is worth continuing.",
-  other:"Three months into a change, the energy has gone. Results have dipped, which everyone was warned about, and people are asking whether it is worth continuing.",
+  ch:[5], w:{3:.7,1:.3}, tw:{5:1},
+  self:"A problem has surfaced that sits squarely between your team and another. It is not clearly anyone's job, both teams have reasons not to pick it up, and it is getting worse each week it sits there.",
+  other:"A problem has surfaced that sits squarely between {N}'s team and another. It is not clearly anyone's job, both teams have reasons not to pick it up, and it is getting worse each week it sits there.",
   opts:[
-    {t:"Pushes harder. The plan was right, and people need to see it through.",s:1},
-    {t:"Quietly scales the change back to something less disruptive.",s:2},
-    {t:"Reassures people that the dip was expected, and holds the line.",s:3},
-    {t:"Finds the parts that are working, makes them visible, and celebrates them by name.",s:4},
-    {t:"Shows the team the progress they cannot see from where they are standing, and is honest about what is still ahead.",s:5}
+    {t:"Escalates it. Someone above needs to decide who owns this.",s:1},
+    {t:"Raises it with the other team and waits to see what they do.",s:2},
+    {t:"Takes it on, and works it out alone.",s:3},
+    {t:"Gets the right people in a room, and they leave with an owner and a first step.",s:4},
+    {t:"Flagged this one weeks ago, before it was a problem. The fix is already running.",s:5}
   ]
 },
+/* -- 5 · Attitude -------------------------------------------------------- */
 {
-  ch:[10], w:{4:.8,2:.2}, tw:{10:1},
-  self:"One of your strongest people asks for a piece of work that is genuinely above where they are today. They might not pull it off.",
-  other:"One of {N}'s strongest people asks for a piece of work that is genuinely above where they are today. They might not pull it off.",
+  ch:[6], w:{2:.7,5:.3}, tw:{6:1},
+  self:"Nothing is badly wrong, but a low-grade grumbling has settled over your team across the last couple of months. It shows up in side conversations and in the tone of meetings more than in anything anyone says directly.",
+  other:"Nothing is badly wrong, but a low-grade grumbling has settled over {N}'s team across the last couple of months. It shows up in side conversations and in the tone of meetings more than in anything anyone says directly.",
+  opts:[
+    {t:"Leaves it. Every team grumbles, and it passes.",s:1},
+    {t:"Tells the team to focus on the positives.",s:2},
+    {t:"Works out where it is coming from and has a quiet word with that person.",s:3},
+    {t:"Names it openly with the team and asks what is actually behind it.",s:4},
+    {t:"Is consistently the first to say out loud what is working, asks people what they would change, then changes one of them.",s:5}
+  ]
+},
+/* -- 6 · Serving People -------------------------------------------------- */
+{
+  ch:[7], w:{2:.6,4:.4}, tw:{7:1},
+  self:"Someone who joined your team six weeks ago is visibly out of their depth. Their work is coming in late and needing rework. They have not asked anyone for help, and nobody has offered.",
+  other:"Someone who joined {N}'s team six weeks ago is visibly out of their depth. Their work is coming in late and needing rework. They have not asked anyone for help, and nobody has offered.",
+  opts:[
+    {t:"Waits. Asking for help is part of the job, and they will get there.",s:1},
+    {t:"Tightens up the instructions and checks the work more closely.",s:2},
+    {t:"Asks how they are finding it at the next scheduled catch-up.",s:3},
+    {t:"Goes to them, names what they have noticed without judgement, and asks what would help.",s:4},
+    {t:"Already knows what they are struggling with, because they have been asking what this job is like from where that person sits.",s:5}
+  ]
+},
+/* -- 7 · Vision ---------------------------------------------------------- */
+{
+  ch:[8], w:{5:.5,4:.5}, tw:{8:1},
+  self:"In a one-to-one, someone on your team stops the usual agenda and asks you directly: where is all this actually going? What are we building here? They mean it seriously.",
+  other:"In a one-to-one, someone on {N}'s team stops the usual agenda and asks directly: where is all this actually going? What are we building here? They mean it seriously.",
+  opts:[
+    {t:"Gives them the targets, and what is expected this quarter.",s:1},
+    {t:"Repeats the organisation's strategy as it was handed down.",s:2},
+    {t:"Explains where the team is heading over the next couple of years.",s:3},
+    {t:"Paints the picture clearly enough that the person could describe it to someone else.",s:4},
+    {t:"Paints the picture, then asks that person where they see themselves in it.",s:5}
+  ]
+},
+/* -- 8 · Self-Discipline ------------------------------------------------- */
+{
+  ch:[9], w:{1:.6,5:.4}, tw:{9:1},
+  self:"There is a standing commitment in your week that nobody else would notice disappearing — the numbers review, the one-to-one with the quietest person on your team, the hour you keep for reading. A genuinely brutal week hits.",
+  other:"There is a standing commitment in {N}'s week that nobody else would notice disappearing — the numbers review, the one-to-one with the quietest person on the team, the hour kept for reading. A genuinely brutal week hits.",
+  opts:[
+    {t:"It goes. It is the obvious thing to drop when the week is full.",s:1},
+    {t:"It gets pushed, and picked up again once things settle.",s:2},
+    {t:"It gets shortened, but it still happens.",s:3},
+    {t:"It happens as normal. It is booked like anything else in the diary.",s:4},
+    {t:"It happens as normal, and the team have noticed that it always does.",s:5}
+  ]
+},
+/* -- 9 · Personal Growth ------------------------------------------------- */
+{
+  ch:[10], w:{4:.7,2:.3}, tw:{10:1},
+  self:"One of your strongest people asks to lead a piece of work that is genuinely above where they are today. They might not pull it off, and it matters enough that failure would be felt.",
+  other:"One of {N}'s strongest people asks to lead a piece of work that is genuinely above where they are today. They might not pull it off, and it matters enough that failure would be felt.",
   opts:[
     {t:"Says not yet, and gives them something closer to their level.",s:1},
     {t:"Gives it to them and lets them sink or swim.",s:2},
@@ -328,10 +289,115 @@ const ITEMS = [
     {t:"Gives it to them, works through it with them, and lets them take it to the leadership team themselves.",s:5}
   ]
 },
+/* -- 10 · Priorities ----------------------------------------------------- */
 {
-  ch:[10], w:{4:.7,1:.3}, tw:{10:1},
-  self:"An unusually quiet week appears in your diary. Two meetings cancel and a deadline moves.",
-  other:"An unusually quiet week appears in {N}'s diary. Two meetings cancel and a deadline moves.",
+  ch:[2], w:{1:.6,3:.4}, tw:{2:1},
+  self:"A well-run organisation you respect invites you onto a new working group. The people are good, the work matters, and it would raise your profile. It also has nothing to do with the three priorities you set for yourself this year.",
+  other:"A well-run organisation invites {N} onto a new working group. The people are good, the work matters, and it would raise their profile. It also has nothing to do with the three priorities {N} set for the year.",
+  opts:[
+    {t:"Says yes. Opportunities like this do not come round twice.",s:1},
+    {t:"Says yes, then quietly struggles to fit it around everything else.",s:2},
+    {t:"Asks for time to think, and says yes to a smaller version of it.",s:3},
+    {t:"Declines, and says what they are saying yes to instead.",s:4},
+    {t:"Declines, and puts forward someone on the team for whom it would be a stretch worth having.",s:5}
+  ]
+},
+/* -- 11 · Character ------------------------------------------------------ */
+{
+  ch:[3], w:{5:.6,1:.4}, tw:{3:1},
+  self:"A piece of work your team delivered has gone down well. In a leadership meeting, a senior executive singles you out by name and praises the result. Most of the actual work was done by two people on your team.",
+  other:"A piece of work {N}'s team delivered has gone down well. In a leadership meeting, a senior executive singles {N} out by name and praises the result. Most of the actual work was done by two people on the team.",
+  opts:[
+    {t:"Accepts the praise. It was their team, and leading it was the contribution.",s:1},
+    {t:"Says the team worked hard on it.",s:2},
+    {t:"Mentions that two people did most of the work.",s:3},
+    {t:"Names both people, and says specifically what each of them did.",s:4},
+    {t:"Names both people, and makes sure they hear the praise directly from the executive.",s:5}
+  ]
+},
+/* -- 12 · Leading Change ------------------------------------------------- */
+{
+  ch:[4], w:{3:.7,2:.3}, tw:{4:1},
+  self:"Three months into a change you led, the early energy has gone. Results have dipped — which everyone was warned would happen — but the dip has lasted longer than you said it would. People are asking openly whether it is worth continuing.",
+  other:"Three months into a change {N} led, the early energy has gone. Results have dipped — which everyone was warned would happen — but the dip has lasted longer than promised. People are asking openly whether it is worth continuing.",
+  opts:[
+    {t:"Pushes harder. The plan was right, and people need to see it through.",s:1},
+    {t:"Quietly scales the change back to something less disruptive.",s:2},
+    {t:"Reassures people that the dip was expected, and holds the line.",s:3},
+    {t:"Finds the parts that are working, makes them visible, and celebrates them by name.",s:4},
+    {t:"Shows the team the progress they cannot see from where they are standing, and is honest about what is still ahead.",s:5}
+  ]
+},
+/* -- 13 · Problem Solving ------------------------------------------------ */
+{
+  ch:[5], w:{3:.6,4:.4}, tw:{5:1},
+  self:"The same problem has come back for the fourth time this year. Each time the team patches it, it works for a while, and everyone moves on. Patching it again would take an afternoon.",
+  other:"The same problem has come back for the fourth time this year. Each time, {N}'s team patches it, it works for a while, and everyone moves on. Patching it again would take an afternoon.",
+  opts:[
+    {t:"Patches it again. It works, and there are bigger things to deal with.",s:1},
+    {t:"Patches it, and adds it to the list of things to look at properly one day.",s:2},
+    {t:"Sets aside time to work out the real cause themselves.",s:3},
+    {t:"Asks the team what is actually causing this, and picks from the options they come back with.",s:4},
+    {t:"Hands the whole thing to someone on the team to solve, and backs the answer they come up with.",s:5}
+  ]
+},
+/* -- 14 · Attitude ------------------------------------------------------- */
+{
+  ch:[6], w:{2:.5,5:.5}, tw:{6:1},
+  self:"A decision you pushed for, against some resistance, has clearly not worked. It is visible across the organisation, and other people have absorbed some of the cost of it.",
+  other:"A decision {N} pushed for, against some resistance, has clearly not worked. It is visible across the organisation, and other people have absorbed some of the cost of it.",
+  opts:[
+    {t:"Explains the circumstances that made it the right call at the time.",s:1},
+    {t:"Accepts that it did not work, and moves the conversation on to the fix.",s:2},
+    {t:"Owns it privately with their own leader, and keeps it low-key with the team.",s:3},
+    {t:"Says plainly to the team that it was their call and it was wrong.",s:4},
+    {t:"Says it was their call, says what they got wrong, and says what they will do differently — in front of the people who paid for it.",s:5}
+  ]
+},
+/* -- 15 · Serving People ------------------------------------------------- */
+{
+  ch:[7], w:{2:.7,4:.3}, tw:{7:1},
+  self:"There is one person you work with regularly whom you simply do not warm to. They have done nothing wrong, they are competent, and the chemistry just is not there. You will be working with them for the foreseeable future.",
+  other:"There is one person {N} works with regularly whom they simply do not warm to. That person has done nothing wrong, is competent, and the chemistry just is not there. They will be working together for the foreseeable future.",
+  opts:[
+    {t:"Keeps it professional, and keeps the contact to a minimum.",s:1},
+    {t:"Is perfectly civil, and gets the work done through other people where possible.",s:2},
+    {t:"Makes an effort to be fair, and is careful not to let it show.",s:3},
+    {t:"Has gone looking for what that person is good at, and puts them in front of it.",s:4},
+    {t:"Has spent enough time understanding how things look from where that person stands that their view of them has changed.",s:5}
+  ]
+},
+/* -- 16 · Vision --------------------------------------------------------- */
+{
+  ch:[8], w:{5:.5,4:.5}, tw:{8:1},
+  self:"Your team is delivering well. Everyone is busy, targets are being met, and nobody has raised their eyes past the current quarter in months.",
+  other:"{N}'s team is delivering well. Everyone is busy, targets are being met, and nobody has raised their eyes past the current quarter in months.",
+  opts:[
+    {t:"Leaves it alone. Delivery is going well and that is the job.",s:1},
+    {t:"Mentions the longer-term picture at the next all-hands.",s:2},
+    {t:"Sets aside time in a team meeting to talk about where things are heading.",s:3},
+    {t:"Runs a proper session on where the team is going, and comes out of it with something everyone can describe.",s:4},
+    {t:"Does that, then changes something in this quarter's work so the direction is visible in what people actually do.",s:5}
+  ]
+},
+/* -- 17 · Self-Discipline ------------------------------------------------ */
+{
+  ch:[9], w:{1:.6,5:.4}, tw:{9:1},
+  self:"There is something you have said you will start for at least six months now — a habit, a discipline, a piece of work on yourself. You still believe it matters. It still has not started.",
+  other:"There is something {N} has said they will start for at least six months now — a habit, a discipline, a piece of work on themselves. They still say it matters. It still has not started.",
+  opts:[
+    {t:"Keeps meaning to. The intent is real, the timing has never been right.",s:1},
+    {t:"Waits for a quieter stretch to begin properly.",s:2},
+    {t:"Starts it, drops it when things get busy, and restarts periodically.",s:3},
+    {t:"Starts small enough that it survives a bad week, and keeps it going.",s:4},
+    {t:"Started it a while ago, told someone who would notice if it stopped, and it is still running.",s:5}
+  ]
+},
+/* -- 18 · Personal Growth ------------------------------------------------ */
+{
+  ch:[10], w:{4:.7,2:.3}, tw:{10:1},
+  self:"An unusually quiet week appears in your diary — two meetings cancel and a deadline moves. For the first time in a while, there is genuine space in it.",
+  other:"An unusually quiet week appears in {N}'s diary — two meetings cancel and a deadline moves. For the first time in a while, there is genuine space in it.",
   opts:[
     {t:"Clears the backlog. It is the first chance in months.",s:1},
     {t:"Gets ahead on next month's work.",s:2},
@@ -340,16 +406,238 @@ const ITEMS = [
     {t:"Spends it on the two people they are developing. That is where the time was always going to go.",s:5}
   ]
 },
+/* -- 19 · Priorities ----------------------------------------------------- */
 {
-  ch:[8,3], w:{5:.5,4:.3,3:.2}, tw:{8:.7,3:.3},
-  self:"In a one-to-one, someone asks you directly: where is all this actually going? What are we building?",
-  other:"In a one-to-one, someone asks {N} directly: where is all this actually going? What are we building?",
+  ch:[2], w:{1:.6,3:.4}, tw:{2:1},
+  self:"You look at next month's calendar and it is already almost solid — recurring meetings, standing check-ins, forums you have sat in for years. There is almost no unbooked time in it anywhere.",
+  other:"{N}'s calendar for next month is already almost solid — recurring meetings, standing check-ins, forums they have sat in for years. There is almost no unbooked time in it anywhere.",
   opts:[
-    {t:"Gives them the targets, and what is expected this quarter.",s:1},
-    {t:"Repeats the organisation's strategy as it was handed down.",s:2},
-    {t:"Explains where the team is heading over the next couple of years.",s:3},
-    {t:"Paints the picture clearly enough that the person could describe it to someone else.",s:4},
-    {t:"Paints the picture, then asks that person where they see themselves in it.",s:5}
+    {t:"Accepts it. A full calendar is what the job looks like at this level.",s:1},
+    {t:"Books an early start or a weekend block to get the real work done.",s:2},
+    {t:"Cancels a couple of the meetings that feel least useful this month.",s:3},
+    {t:"Goes through the recurring meetings properly and gets out of the ones that no longer need them.",s:4},
+    {t:"Holds a standing block of unbooked time and defends it like any other commitment.",s:5}
+  ]
+},
+/* -- 20 · Character ------------------------------------------------------ */
+{
+  ch:[3], w:{5:.7,1:.3}, tw:{3:1},
+  self:"You are asked to do something that is within the rules and would solve a real problem, but it involves presenting a situation in a way that is technically accurate and genuinely misleading. The person asking is more senior than you.",
+  other:"{N} is asked to do something that is within the rules and would solve a real problem, but involves presenting a situation in a way that is technically accurate and genuinely misleading. The person asking is more senior than them.",
+  opts:[
+    {t:"Does it. It is within the rules, and it was not their call to make.",s:1},
+    {t:"Does it, but keeps a record showing they raised a concern.",s:2},
+    {t:"Softens it as far as they can without refusing outright.",s:3},
+    {t:"Says they are not comfortable with it, and asks for another way to solve the problem.",s:4},
+    {t:"Says plainly that they will not do it, explains why, and puts forward an alternative that solves the real problem.",s:5}
+  ]
+},
+/* -- 21 · Leading Change ------------------------------------------------- */
+{
+  ch:[4], w:{3:.7,2:.3}, tw:{4:1},
+  self:"You have decided on a change that will affect how the whole team works. Nothing has been announced yet. The next team meeting is in a week.",
+  other:"{N} has decided on a change that will affect how the whole team works. Nothing has been announced yet. The next team meeting is in a week.",
+  opts:[
+    {t:"Announces it at the meeting. Telling everyone at once is the fairest way.",s:1},
+    {t:"Prepares the announcement carefully so the reasoning is clear.",s:2},
+    {t:"Gives their own leader a heads-up, then announces it to the team.",s:3},
+    {t:"Talks to the people it will affect most before the meeting, and listens to what comes back.",s:4},
+    {t:"Talks to them beforehand, changes part of the plan based on what they say, and lets them help present it.",s:5}
+  ]
+},
+/* -- 22 · Problem Solving ------------------------------------------------ */
+{
+  ch:[5], w:{3:.7,1:.3}, tw:{5:1},
+  self:"A decision has to be made this week, and the information you would want in order to make it well simply is not available in time. Waiting has its own cost.",
+  other:"A decision has to be made this week, and the information {N} would want in order to make it well simply is not available in time. Waiting has its own cost.",
+  opts:[
+    {t:"Waits for better information. Deciding blind is how bad calls get made.",s:1},
+    {t:"Escalates it so someone more senior carries the decision.",s:2},
+    {t:"Makes the call on their best judgement and moves on.",s:3},
+    {t:"Makes the call, says out loud what they are assuming, and sets a date to revisit it.",s:4},
+    {t:"Does that, and picks the option that keeps the most doors open if the assumption turns out wrong.",s:5}
+  ]
+},
+/* -- 23 · Attitude ------------------------------------------------------- */
+{
+  ch:[6], w:{2:.7,5:.3}, tw:{6:1},
+  self:"Your budget is cut mid-year by a decision made well above you. The targets you are accountable for do not change. Your team finds out the same week you do.",
+  other:"{N}'s budget is cut mid-year by a decision made well above them. The targets they are accountable for do not change. The team finds out the same week they do.",
+  opts:[
+    {t:"Is straight with the team that this was done to them and it is not reasonable.",s:1},
+    {t:"Says little about it and absorbs the pressure quietly.",s:2},
+    {t:"Acknowledges it is hard, and asks everyone to push through.",s:3},
+    {t:"Gets the team together to work out what they will stop doing, rather than doing everything with less.",s:4},
+    {t:"Does that, and goes back up with a clear case for what the cut will actually cost.",s:5}
+  ]
+},
+/* -- 24 · Serving People ------------------------------------------------- */
+{
+  ch:[7], w:{2:.6,4:.4}, tw:{7:1},
+  self:"Someone on your team is going through something difficult at home. Their work has slipped noticeably. They have not asked for anything, and the rest of the team have quietly started picking up the slack.",
+  other:"Someone on {N}'s team is going through something difficult at home. Their work has slipped noticeably. They have not asked for anything, and the rest of the team have quietly started picking up the slack.",
+  opts:[
+    {t:"Waits for them to raise it. It is their private business until they say otherwise.",s:1},
+    {t:"Reminds them of the support the organisation offers.",s:2},
+    {t:"Checks in, and tells them to take whatever time they need.",s:3},
+    {t:"Checks in, then actually redistributes the work so the team is not quietly carrying it.",s:4},
+    {t:"Does that, agrees openly with the team how they will cover it, and keeps checking in after the crisis passes.",s:5}
+  ]
+},
+/* -- 25 · Vision --------------------------------------------------------- */
+{
+  ch:[8], w:{5:.6,4:.4}, tw:{8:1},
+  self:"Something has come up that does not fit this year's plan but could matter a great deal in three years. Taking it seriously would cost you real capacity now, and the payoff is genuinely uncertain.",
+  other:"Something has come up that does not fit {N}'s plan for the year but could matter a great deal in three years. Taking it seriously would cost real capacity now, and the payoff is genuinely uncertain.",
+  opts:[
+    {t:"Lets it go. The plan is the plan, and chasing this would cost delivery.",s:1},
+    {t:"Notes it down to look at properly next planning cycle.",s:2},
+    {t:"Gives it a small amount of time to see whether it is real.",s:3},
+    {t:"Puts a real person and real time on testing it, and sets a point to decide.",s:4},
+    {t:"Does that, and is explicit with the team about what they are giving up now and why it is worth it.",s:5}
+  ]
+},
+/* -- 26 · Self-Discipline ------------------------------------------------ */
+{
+  ch:[9], w:{1:.5,5:.5}, tw:{9:1},
+  self:"It is the end of a long day. There is one more thing on your list — important, not urgent, and nobody is expecting it tomorrow. You are tired.",
+  other:"It is the end of a long day for {N}. There is one more thing on the list — important, not urgent, and nobody is expecting it tomorrow. They are tired.",
+  opts:[
+    {t:"Leaves it. There will be a better time to do it justice.",s:1},
+    {t:"Has a quick go at it and finishes it off tomorrow.",s:2},
+    {t:"Does it, tired, because it is on the list.",s:3},
+    {t:"Leaves it, but books a specific time for it rather than leaving it floating.",s:4},
+    {t:"Rarely ends up here — work like this already has a protected slot earlier in the week.",s:5}
+  ]
+},
+/* -- 27 · Personal Growth ------------------------------------------------ */
+{
+  ch:[10], w:{4:.6,2:.4}, tw:{10:1},
+  self:"Someone gives you feedback that lands badly. Your first reaction is that it is not fair, and you can think of several reasons why they have got it wrong.",
+  other:"Someone gives {N} feedback that lands badly. Their first reaction is visibly that it is not fair, and they have several reasons why the person has got it wrong.",
+  opts:[
+    {t:"Explains why the feedback is not quite right.",s:1},
+    {t:"Takes it politely, and privately discounts it.",s:2},
+    {t:"Thanks them, sits with it, and takes what is useful.",s:3},
+    {t:"Asks them for a specific example, and keeps asking until they understand it.",s:4},
+    {t:"Does that, tells them later what they changed because of it, and asks for more.",s:5}
+  ]
+},
+/* -- 28 · Priorities ----------------------------------------------------- */
+{
+  ch:[2], w:{1:.5,3:.5}, tw:{2:1},
+  self:"Two things on your plate genuinely matter and both are due. One is highly visible — your boss will notice it immediately. The other matters more to the business but nobody is watching it. You have time to do one of them properly.",
+  other:"Two things on {N}'s plate genuinely matter and both are due. One is highly visible — their boss will notice it immediately. The other matters more to the business but nobody is watching it. There is time to do one of them properly.",
+  opts:[
+    {t:"Does the visible one properly and does what they can on the other.",s:1},
+    {t:"Splits the time and gets both to an acceptable standard.",s:2},
+    {t:"Does the one that matters more, and flags the delay on the other.",s:3},
+    {t:"Does the one that matters more, and tells their boss why before it is noticed.",s:4},
+    {t:"Had already agreed with their boss which of the two comes first, well before it was a crunch.",s:5}
+  ]
+},
+/* -- 29 · Character ------------------------------------------------------ */
+{
+  ch:[3], w:{5:.5,1:.5}, tw:{3:1},
+  self:"You discover a mistake you made three weeks ago. It has not caused visible damage yet, and there is a reasonable chance nobody will ever connect it to you. Fixing it quietly is possible.",
+  other:"{N} discovers a mistake they made three weeks ago. It has not caused visible damage yet, and there is a reasonable chance nobody will ever connect it to them. Fixing it quietly is possible.",
+  opts:[
+    {t:"Fixes it quietly. No harm done, and no purpose in stirring it up.",s:1},
+    {t:"Fixes it, and mentions it only if it ever comes up.",s:2},
+    {t:"Fixes it and tells their own leader, but not the wider team.",s:3},
+    {t:"Fixes it and tells the people it could have affected, unprompted.",s:4},
+    {t:"Tells people before it is fixed, says what caused it, and changes the thing that let it happen.",s:5}
+  ]
+},
+/* -- 30 · Leading Change ------------------------------------------------- */
+{
+  ch:[4], w:{3:.8,2:.2}, tw:{4:1},
+  self:"A change is handed down from above that you did not choose and do not fully agree with. You have to implement it with your team, and they will ask you what you think of it.",
+  other:"A change is handed down from above that {N} did not choose and does not fully agree with. They have to implement it with the team, and the team will ask what they think of it.",
+  opts:[
+    {t:"Tells the team it was not their decision and they are all in the same boat.",s:1},
+    {t:"Presents it neutrally and lets people draw their own conclusions.",s:2},
+    {t:"Backs it publicly and keeps their reservations to themselves.",s:3},
+    {t:"Says honestly which parts they would have done differently, and why they are still behind it.",s:4},
+    {t:"Does that, and goes back up with the team's specific objections rather than just passing the decision down.",s:5}
+  ]
+},
+/* -- 31 · Problem Solving ------------------------------------------------ */
+{
+  ch:[5], w:{3:.6,4:.4}, tw:{5:1},
+  self:"Someone on your team comes to you with a problem they are stuck on. You can see a workable answer almost immediately.",
+  other:"Someone on {N}'s team comes to them with a problem they are stuck on. {N} can see a workable answer almost immediately.",
+  opts:[
+    {t:"Gives them the answer. It saves everyone time.",s:1},
+    {t:"Gives them the answer and explains the reasoning behind it.",s:2},
+    {t:"Asks what they have tried, then gives them the answer.",s:3},
+    {t:"Asks questions until they get there themselves, even though it takes longer.",s:4},
+    {t:"Asks them to come back with two options and a recommendation, and backs whichever they choose.",s:5}
+  ]
+},
+/* -- 32 · Attitude ------------------------------------------------------- */
+{
+  ch:[6], w:{2:.7,5:.3}, tw:{6:1},
+  self:"You encouraged someone on your team to try a new approach. They took the risk, it did not work, and it cost the team time. They are visibly deflated.",
+  other:"{N} encouraged someone on the team to try a new approach. They took the risk, it did not work, and it cost the team time. They are visibly deflated.",
+  opts:[
+    {t:"Goes back to the way it was done before, and does not dwell on it.",s:1},
+    {t:"Reassures them privately and moves the team on.",s:2},
+    {t:"Talks it through with them and pulls out what can be learned.",s:3},
+    {t:"Says publicly that they backed the attempt and would back it again.",s:4},
+    {t:"Does that, names what the team learned from it, and asks them to lead the next attempt.",s:5}
+  ]
+},
+/* -- 33 · Serving People ------------------------------------------------- */
+{
+  ch:[7], w:{2:.5,4:.5}, tw:{7:1},
+  self:"There is a task on your team that nobody wants: tedious, invisible, and necessary. It has been sitting unclaimed for a fortnight.",
+  other:"There is a task on {N}'s team that nobody wants: tedious, invisible, and necessary. It has been sitting unclaimed for a fortnight.",
+  opts:[
+    {t:"Assigns it to whoever has the most spare capacity.",s:1},
+    {t:"Assigns it to whoever did it last, since they already know how.",s:2},
+    {t:"Rotates it, so the same person is not stuck with it every time.",s:3},
+    {t:"Does it themselves this time, without making a point of it.",s:4},
+    {t:"Does it themselves, and then works out with the team how to get rid of the task altogether.",s:5}
+  ]
+},
+/* -- 34 · Vision --------------------------------------------------------- */
+{
+  ch:[8], w:{5:.4,4:.6}, tw:{8:1},
+  self:"Someone senior joins your team. In their first week, they ask you what the team is really trying to achieve.",
+  other:"Someone senior joins {N}'s team. In their first week, they ask what the team is really trying to achieve.",
+  opts:[
+    {t:"Points them at the strategy deck and the current objectives.",s:1},
+    {t:"Walks them through this year's targets and how the team is structured.",s:2},
+    {t:"Explains where the team is heading and how their role fits into it.",s:3},
+    {t:"Tells them how the team got here and where it is going, so that it sticks.",s:4},
+    {t:"Does that, then asks what they can see that the team has stopped noticing.",s:5}
+  ]
+},
+/* -- 35 · Self-Discipline ------------------------------------------------ */
+{
+  ch:[9], w:{1:.5,5:.5}, tw:{9:1},
+  self:"You set a standard for the team a few months ago — how quickly things get responded to, how meetings run, how work gets written down. This week, keeping to it yourself would be genuinely inconvenient.",
+  other:"{N} set a standard for the team a few months ago — how quickly things get responded to, how meetings run, how work gets written down. This week, keeping to it themselves would be genuinely inconvenient.",
+  opts:[
+    {t:"Makes an exception. The standard is for the team's benefit, and they have bigger calls on their time.",s:1},
+    {t:"Cuts the corner quietly and gets back to it next week.",s:2},
+    {t:"Keeps to it, but lets everyone know what it cost them.",s:3},
+    {t:"Keeps to it, because a standard does not mean much if it has exceptions at the top.",s:4},
+    {t:"Keeps to it, and says out loud that it was inconvenient and they did it anyway.",s:5}
+  ]
+},
+/* -- 36 · Personal Growth ------------------------------------------------ */
+{
+  ch:[10], w:{4:.6,2:.4}, tw:{10:1},
+  self:"There is something you do a particular way and have done for years. It works. You have just watched someone else do the same thing noticeably better.",
+  other:"There is something {N} does a particular way and has done for years. It works. They have just watched someone else do the same thing noticeably better.",
+  opts:[
+    {t:"Notes it, and carries on. Their way works and it is proven.",s:1},
+    {t:"Takes one small idea from it and leaves the rest.",s:2},
+    {t:"Thinks about changing, and will get to it when there is time.",s:3},
+    {t:"Goes and asks that person how they do it, and changes their own approach.",s:4},
+    {t:"Does that, and gets the person to show the rest of the team too.",s:5}
   ]
 }
 ];
@@ -522,8 +810,8 @@ function shuffle(a){
 /* landing */
 function vLanding(){
   return `
-  <p class="scenario">Fifteen situations. No right answers, no scores on screen — just what this leader would most typically do.</p>
-  <p class="muted">About ten minutes.</p>
+  <p class="scenario">Thirty-six situations. No right answers, no scores on screen — just what this leader would most typically do.</p>
+  <p class="muted">About twenty minutes.</p>
   <div class="spacer"></div>
   <button class="btn-block btn-primary" data-start-self>Assess myself
     <span class="faint" style="display:block;font-weight:400;font-family:var(--font-body);margin-top:4px;color:inherit;opacity:.8">Starts a new round you can invite raters to.</span></button>`;
@@ -606,7 +894,7 @@ function vDone(){
   const origin = location.origin + location.pathname;
   const leaderUrl = origin + "?leader=" + state.urlCtx.leaderId;
   const inviteUrl = origin + "?round=" + state.urlCtx.roundId + "&for=" + encodeURIComponent(state.name);
-  const inviteBody = `I'm doing a leadership 360 as part of Developing the Leader Within You 2.0, and I'd value your honest read of how I actually lead. It's fifteen short scenarios, about ten minutes.\n\n${inviteUrl}`;
+  const inviteBody = `I'm doing a leadership 360 as part of Developing the Leader Within You 2.0, and I'd value your honest read of how I actually lead. It's thirty-six short scenarios, about twenty minutes.\n\n${inviteUrl}`;
   return `
   <h2>Done — thank you</h2>
   <p class="muted">Your self-assessment is recorded.</p>
@@ -618,7 +906,7 @@ function vDone(){
   <div class="spacer"></div>
   <h3>Now invite your raters</h3>
   <div style="height:10px"></div>
-  <p class="muted">Send this link to each person giving feedback — it takes them straight to the fifteen scenarios, no code to send back.</p>
+  <p class="muted">Send this link to each person giving feedback — it takes them straight to the scenarios, no code to send back.</p>
   <div class="code">${esc(inviteUrl)}</div>
   <div class="btn-row" style="margin-top:0">
     <button data-copy="${esc(inviteUrl)}">Copy invite link</button>
@@ -670,8 +958,30 @@ function vReport(){
 }
 
 function reportHTML(d){
-  const self = d.self;
-  const raters = d.raters;
+  // Responses are only scorable against the item bank they were answered on.
+  // A round recorded before the bank was expanded has a shorter answer array;
+  // drop those rather than index past the end of it and crash the report.
+  const compatible = r => r && Array.isArray(r.ans) && r.ans.length === ITEMS.length;
+  const staleSelf = d.self && !compatible(d.self);
+  const staleRaters = d.raters.filter(r=>!compatible(r)).length;
+  const self = compatible(d.self) ? d.self : null;
+  const raters = d.raters.filter(compatible);
+
+  if(staleSelf || staleRaters){
+    const nothingLeft = !self && raters.length===0;
+    if(nothingLeft) return `
+      <div class="btn-row" style="margin-bottom:8px">
+        <a class="link" href="?leader=${d.leaderId}">&larr; Your assessments</a>
+      </div>
+      <div class="headline">
+        <div class="eyebrow">Earlier version</div>
+        <div class="lvl">This round can't be scored</div>
+        <p class="muted">It was answered on an earlier, shorter version of the assessment, so its answers don't line up with the current questions. The responses are still stored, but they can't be compared against the current scoring.</p>
+        <p class="muted">Start a new round to get a report on the current version.</p>
+      </div>
+      <a class="btn btn-primary" href="?leader=${d.leaderId}&newround=1">Start a new round</a>`;
+  }
+
   const selfLevels = self ? levelScores(self.ans) : null;
   const selfTraits = self ? traitScores(self.ans) : null;
   const rLevelScores = raters.map(r=>levelScores(r.ans));
@@ -715,6 +1025,11 @@ function reportHTML(d){
     <a class="link" href="?leader=${d.leaderId}">&larr; Your assessments</a>
     <button class="link" data-refresh-report>Refresh</button>
   </div>
+
+  ${ (staleSelf || staleRaters) ? `<div class="err">Left out of this report: ${[
+        staleSelf ? "your own self-assessment" : null,
+        staleRaters ? `${staleRaters} rater response${staleRaters>1?"s":""}` : null
+      ].filter(Boolean).join(" and ")} — answered on an earlier, shorter version of the assessment, so they can't be scored against the current questions. Start a new round for a clean comparison.</div>` : "" }
 
   <div class="headline">
     <div class="eyebrow">What the people around you say</div>
