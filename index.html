@@ -691,6 +691,10 @@ const GAP = 0.75;
 // answer differ by a full maturity point or more — smaller gaps are within
 // normal rater disagreement and aren't worth spotlighting.
 const SPLIT_CUTOFF = 1;
+// FLAG_LIMIT: with nine traits a leader can technically clear the GAP
+// threshold on most of them; showing all of them buries the signal, so cap
+// the callouts at the widest few and count the rest.
+const FLAG_LIMIT = 3;
 
 /* ---------------------------------------------------------------- scoring */
 function scoresFor(ans, field, keys){
@@ -1066,10 +1070,12 @@ function reportHTML(d){
   ${ blind.length===0 && hidden.length===0
     ? `<p class="muted">No trait differs by more than ${GAP} of a point. How you see yourself and how they see you are broadly the same — which is itself worth knowing.</p>`
     : "" }
-  ${blind.map(b=>`<div class="flag"><div class="t">Blind spot · ${TRAITS[b.k].name}</div>
-    <div>You rate yourself ${b.d.toFixed(1)} points higher here than the people around you do. This is the gap that costs you the most, because you are not currently looking at it.</div></div>`).join("")}
-  ${hidden.map(h=>`<div class="flag up"><div class="t">Hidden strength · ${TRAITS[h.k].name}</div>
-    <div>They rate you ${h.d.toFixed(1)} points higher here than you rate yourself. You are getting credit you are not claiming — and probably not deliberately repeating.</div></div>`).join("")}
+  ${blind.slice(0,FLAG_LIMIT).map((b,i)=>`<div class="flag"><div class="t">Blind spot · ${TRAITS[b.k].name}</div>
+    <div>You rate yourself ${b.d.toFixed(1)} points higher here than the people around you do.${i===0?" This is your widest gap — the one you are least likely to be looking at.":""}</div></div>`).join("")}
+  ${ blind.length>FLAG_LIMIT ? `<p class="faint">${blind.length-FLAG_LIMIT} more trait${blind.length-FLAG_LIMIT>1?"s":""} where you rate yourself higher than they do — see the full list above.</p>` : "" }
+  ${hidden.slice(0,FLAG_LIMIT).map((h,i)=>`<div class="flag up"><div class="t">Hidden strength · ${TRAITS[h.k].name}</div>
+    <div>They rate you ${h.d.toFixed(1)} points higher here than you rate yourself.${i===0?" You are getting credit you are not claiming — and probably not deliberately repeating.":""}</div></div>`).join("")}
+  ${ hidden.length>FLAG_LIMIT ? `<p class="faint">${hidden.length-FLAG_LIMIT} more trait${hidden.length-FLAG_LIMIT>1?"s":""} where they rate you higher than you rate yourself.</p>` : "" }
   ` : `<div class="spacer"></div><p class="muted">This round doesn't have a self-assessment on file, so blind spots can't be compared.</p>`}
 
   ${ splits.length ? `
